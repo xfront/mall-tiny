@@ -1,28 +1,26 @@
-package com.macro.mall.tiny.modules.ums.mapper;
+package com.macro.mall.tiny.modules.ums.mapper
 
-import com.macro.mall.tiny.modules.ums.model.UmsMenu;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper
+import com.macro.mall.tiny.modules.ums.model.UmsMenu
+import org.apache.ibatis.annotations.Param
 
 /**
- * <p>
+ *
+ *
  * 后台菜单表 Mapper 接口
- * </p>
+ *
  *
  * @author macro
  * @since 2020-08-21
  */
-public interface UmsMenuMapper extends BaseMapper<UmsMenu> {
-
+interface UmsMenuMapper : BaseMapper<UmsMenu> {
     /**
      * 根据后台用户ID获取菜单
      */
-    List<UmsMenu> getMenuList(@Param("adminId") Long adminId);
+    fun getMenuList(@Param("adminId") adminId: Long): List<UmsMenu>
+
     /**
      * 根据角色ID获取菜单
      */
-    List<UmsMenu> getMenuListByRoleId(@Param("roleId") Long roleId);
-
+    fun getMenuListByRoleId(@Param("roleId") roleId: Long): List<UmsMenu>
 }

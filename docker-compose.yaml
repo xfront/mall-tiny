@@ -1,0 +1,61 @@
+version: "3"
+
+services:
+  gitea:
+    image: gitea/gitea
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=mysql
+      - DB_HOST=mysql:3306
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+    networks:
+      - dev
+    volumes:
+      - gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=gitea
+      - MYSQL_USER=gitea
+      - MYSQL_PASSWORD=gitea
+      - MYSQL_DATABASE=gitea
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - dev
+    ports:
+      - "3306:3306"
+  redis:
+    image: redis
+    container_name: docker_redis
+    volumes:
+      - /data/docker/volumes/redis:/data
+      - /data/docker/volumes/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /data/docker/volumes/redis/logs:/logs
+    ports:
+      - "6379:6379"
+volumes:
+  gitea:
+    external: true
+  mysql:
+    external: true
+
+networks:
+  dev:
+    driver: bridge
+    #ipam:
+    #config:
+    #- subnet: 172.23.0.0/16

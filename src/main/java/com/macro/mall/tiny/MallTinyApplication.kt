@@ -1,13 +1,13 @@
-package com.macro.mall.tiny;
+package com.macro.mall.tiny
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+
+annotation class AllOpen
 
 @SpringBootApplication
-public class MallTinyApplication {
+class  MallTinyApplication
 
-    public static void main(String[] args) {
-        SpringApplication.run(MallTinyApplication.class, args);
-    }
-
+fun main(args: Array<String>) {
+    SpringApplication.run(MallTinyApplication::class.java, *args)
 }

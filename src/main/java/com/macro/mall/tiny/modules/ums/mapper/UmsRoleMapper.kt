@@ -1,24 +1,21 @@
-package com.macro.mall.tiny.modules.ums.mapper;
+package com.macro.mall.tiny.modules.ums.mapper
 
-import com.macro.mall.tiny.modules.ums.model.UmsRole;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper
+import com.macro.mall.tiny.modules.ums.model.UmsRole
+import org.apache.ibatis.annotations.Param
 
 /**
- * <p>
+ *
+ *
  * 后台用户角色表 Mapper 接口
- * </p>
+ *
  *
  * @author macro
  * @since 2020-08-21
  */
-public interface UmsRoleMapper extends BaseMapper<UmsRole> {
-
+interface UmsRoleMapper : BaseMapper<UmsRole> {
     /**
      * 获取用户所有角色
      */
-    List<UmsRole> getRoleList(@Param("adminId") Long adminId);
-
+    fun getRoleList(@Param("adminId") adminId: Long): List<UmsRole>
 }

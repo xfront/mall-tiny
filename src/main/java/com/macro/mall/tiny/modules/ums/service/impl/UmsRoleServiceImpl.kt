@@ -1,116 +1,105 @@
-package com.macro.mall.tiny.modules.ums.service.impl;
+package com.macro.mall.tiny.modules.ums.service.impl
 
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.macro.mall.tiny.modules.ums.mapper.UmsMenuMapper;
-import com.macro.mall.tiny.modules.ums.mapper.UmsResourceMapper;
-import com.macro.mall.tiny.modules.ums.mapper.UmsRoleMapper;
-import com.macro.mall.tiny.modules.ums.model.*;
-import com.macro.mall.tiny.modules.ums.service.UmsAdminCacheService;
-import com.macro.mall.tiny.modules.ums.service.UmsRoleMenuRelationService;
-import com.macro.mall.tiny.modules.ums.service.UmsRoleResourceRelationService;
-import com.macro.mall.tiny.modules.ums.service.UmsRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
+import com.macro.mall.tiny.modules.ums.mapper.UmsMenuMapper
+import com.macro.mall.tiny.modules.ums.mapper.UmsResourceMapper
+import com.macro.mall.tiny.modules.ums.mapper.UmsRoleMapper
+import com.macro.mall.tiny.modules.ums.model.*
+import com.macro.mall.tiny.modules.ums.service.UmsAdminCacheService
+import com.macro.mall.tiny.modules.ums.service.UmsRoleMenuRelationService
+import com.macro.mall.tiny.modules.ums.service.UmsRoleResourceRelationService
+import com.macro.mall.tiny.modules.ums.service.UmsRoleService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import java.util.*
 
 /**
  * 后台角色管理Service实现类
  * Created by macro on 2018/9/30.
  */
 @Service
-public class UmsRoleServiceImpl extends ServiceImpl<UmsRoleMapper,UmsRole>implements UmsRoleService {
+class UmsRoleServiceImpl : ServiceImpl<UmsRoleMapper, UmsRole>(), UmsRoleService {
     @Autowired
-    private UmsAdminCacheService adminCacheService;
+    lateinit var adminCacheService: UmsAdminCacheService
+
     @Autowired
-    private UmsRoleMenuRelationService roleMenuRelationService;
+    lateinit var roleMenuRelationService: UmsRoleMenuRelationService
+
     @Autowired
-    private UmsRoleResourceRelationService roleResourceRelationService;
+    lateinit var roleResourceRelationService: UmsRoleResourceRelationService
+
     @Autowired
-    private UmsMenuMapper menuMapper;
+    lateinit var menuMapper: UmsMenuMapper
+
     @Autowired
-    private UmsResourceMapper resourceMapper;
-    @Override
-    public boolean create(UmsRole role) {
-        role.setCreateTime(new Date());
-        role.setAdminCount(0);
-        role.setSort(0);
-        return save(role);
+    lateinit var resourceMapper: UmsResourceMapper
+
+    override fun create(role: UmsRole): Boolean {
+        role.createTime = Date()
+        role.adminCount = 0
+        role.sort = 0
+        return save(role)
     }
 
-    @Override
-    public boolean delete(List<Long> ids) {
-        boolean success = removeByIds(ids);
-        adminCacheService.delResourceListByRoleIds(ids);
-        return success;
+    override fun delete(ids: List<Long>): Boolean {
+        val success = removeByIds(ids)
+        adminCacheService.delResourceListByRoleIds(ids)
+        return success
     }
 
-    @Override
-    public Page<UmsRole> list(String keyword, Integer pageSize, Integer pageNum) {
-        Page<UmsRole> page = new Page<>(pageNum,pageSize);
-        QueryWrapper<UmsRole> wrapper = new QueryWrapper<>();
-        LambdaQueryWrapper<UmsRole> lambda = wrapper.lambda();
-        if(StrUtil.isNotEmpty(keyword)){
-            lambda.like(UmsRole::getName,keyword);
+    override fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsRole> {
+        val page = Page<UmsRole>(pageNum, pageSize)
+        val wrapper = QueryWrapper<UmsRole>()
+        if (!keyword.isNullOrBlank()) {
+            wrapper.like("name", keyword)
         }
-        return page(page,wrapper);
+        return page(page, wrapper)
     }
 
-    @Override
-    public List<UmsMenu> getMenuList(Long adminId) {
-        return menuMapper.getMenuList(adminId);
+    override fun getMenuList(adminId: Long): List<UmsMenu> {
+        return menuMapper.getMenuList(adminId)
     }
 
-    @Override
-    public List<UmsMenu> listMenu(Long roleId) {
-        return menuMapper.getMenuListByRoleId(roleId);
+    override fun listMenu(roleId: Long): List<UmsMenu> {
+        return menuMapper.getMenuListByRoleId(roleId)
     }
 
-    @Override
-    public List<UmsResource> listResource(Long roleId) {
-        return resourceMapper.getResourceListByRoleId(roleId);
+    override fun listResource(roleId: Long): List<UmsResource> {
+        return resourceMapper.getResourceListByRoleId(roleId)
     }
 
-    @Override
-    public int allocMenu(Long roleId, List<Long> menuIds) {
-        //先删除原有关系
-        QueryWrapper<UmsRoleMenuRelation> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsRoleMenuRelation::getRoleId,roleId);
-        roleMenuRelationService.remove(wrapper);
-        //批量插入新关系
-        List<UmsRoleMenuRelation> relationList = new ArrayList<>();
-        for (Long menuId : menuIds) {
-            UmsRoleMenuRelation relation = new UmsRoleMenuRelation();
-            relation.setRoleId(roleId);
-            relation.setMenuId(menuId);
-            relationList.add(relation);
+    override fun allocMenu(roleId: Long, menuIds: List<Long>): Int { //先删除原有关系
+        val wrapper = QueryWrapper<UmsRoleMenuRelation>()
+        wrapper.eq("role_id", roleId)
+        //wrapper.lambda().eq(UmsRoleMenuRelation::roleId, roleId)
+        roleMenuRelationService.remove(wrapper) //批量插入新关系
+        val relationList = mutableListOf<UmsRoleMenuRelation>()
+        for (menuId in menuIds) {
+            val relation = UmsRoleMenuRelation()
+            relation.roleId = roleId
+            relation.menuId = menuId
+            relationList.add(relation)
         }
-        roleMenuRelationService.saveBatch(relationList);
-        return menuIds.size();
+        roleMenuRelationService.saveBatch(relationList)
+        return menuIds.size
     }
 
-    @Override
-    public int allocResource(Long roleId, List<Long> resourceIds) {
-        //先删除原有关系
-        QueryWrapper<UmsRoleResourceRelation> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsRoleResourceRelation::getRoleId,roleId);
-        roleResourceRelationService.remove(wrapper);
-        //批量插入新关系
-        List<UmsRoleResourceRelation> relationList = new ArrayList<>();
-        for (Long resourceId : resourceIds) {
-            UmsRoleResourceRelation relation = new UmsRoleResourceRelation();
-            relation.setRoleId(roleId);
-            relation.setResourceId(resourceId);
-            relationList.add(relation);
+    override fun allocResource(roleId: Long, resourceIds: List<Long>): Int { //先删除原有关系
+        val wrapper = QueryWrapper<UmsRoleResourceRelation>()
+        wrapper.eq("role_id", roleId)
+        //wrapper.lambda().eq(UmsRoleResourceRelation::roleId, roleId)
+        roleResourceRelationService.remove(wrapper) //批量插入新关系
+        val relationList = mutableListOf<UmsRoleResourceRelation>()
+        for (resourceId in resourceIds) {
+            val relation = UmsRoleResourceRelation()
+            relation.roleId = roleId
+            relation.resourceId = resourceId
+            relationList.add(relation)
         }
-        roleResourceRelationService.saveBatch(relationList);
-        adminCacheService.delResourceListByRole(roleId);
-        return resourceIds.size();
+        roleResourceRelationService.saveBatch(relationList)
+        adminCacheService.delResourceListByRole(roleId)
+        return resourceIds.size
     }
 }

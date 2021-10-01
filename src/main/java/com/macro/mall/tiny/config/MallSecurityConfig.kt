@@ -1,21 +1,17 @@
-package com.macro.mall.tiny.config;
+package com.macro.mall.tiny.config
 
-import com.macro.mall.tiny.modules.ums.model.UmsResource;
-import com.macro.mall.tiny.modules.ums.service.UmsAdminService;
-import com.macro.mall.tiny.modules.ums.service.UmsResourceService;
-import com.macro.mall.tiny.security.component.DynamicSecurityService;
-import com.macro.mall.tiny.security.config.SecurityConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.macro.mall.tiny.modules.ums.service.UmsAdminService
+import com.macro.mall.tiny.modules.ums.service.UmsResourceService
+import com.macro.mall.tiny.security.component.DynamicSecurityService
+import com.macro.mall.tiny.security.config.SecurityConfig
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.access.ConfigAttribute
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.core.userdetails.UserDetailsService
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * mall-security模块相关配置
@@ -24,31 +20,31 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class MallSecurityConfig extends SecurityConfig {
+class MallSecurityConfig : SecurityConfig() {
+    @Autowired
+    lateinit var adminService: UmsAdminService
 
     @Autowired
-    private UmsAdminService adminService;
-    @Autowired
-    private UmsResourceService resourceService;
+    lateinit var resourceService: UmsResourceService
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public override fun userDetailsService(): UserDetailsService {
         //获取登录用户信息
-        return username -> adminService.loadUserByUsername(username);
+        return UserDetailsService { adminService.loadUserByUsername(it) }
     }
 
     @Bean
-    public DynamicSecurityService dynamicSecurityService() {
-        return new DynamicSecurityService() {
-            @Override
-            public Map<String, ConfigAttribute> loadDataSource() {
-                Map<String, ConfigAttribute> map = new ConcurrentHashMap<>();
-                List<UmsResource> resourceList = resourceService.list();
-                for (UmsResource resource : resourceList) {
-                    map.put(resource.getUrl(), new org.springframework.security.access.SecurityConfig(resource.getId() + ":" + resource.getName()));
+    fun dynamicSecurityService(): DynamicSecurityService {
+        return object : DynamicSecurityService {
+            override fun loadDataSource(): MutableMap<String, ConfigAttribute> {
+                val map = ConcurrentHashMap<String, ConfigAttribute>()
+                val resourceList = resourceService.list()
+                for (resource in resourceList) {
+                    map[resource!!.url] =
+                        org.springframework.security.access.SecurityConfig("""${resource.id}:${resource.name}""")
                 }
-                return map;
+                return map
             }
-        };
+        }
     }
 }

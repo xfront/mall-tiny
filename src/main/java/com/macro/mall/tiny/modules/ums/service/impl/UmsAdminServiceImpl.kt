@@ -1,267 +1,251 @@
-package com.macro.mall.tiny.modules.ums.service.impl;
+package com.macro.mall.tiny.modules.ums.service.impl
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.macro.mall.tiny.common.exception.Asserts;
-import com.macro.mall.tiny.domain.AdminUserDetails;
-import com.macro.mall.tiny.modules.ums.dto.UmsAdminParam;
-import com.macro.mall.tiny.modules.ums.dto.UpdateAdminPasswordParam;
-import com.macro.mall.tiny.modules.ums.mapper.UmsAdminLoginLogMapper;
-import com.macro.mall.tiny.modules.ums.mapper.UmsAdminMapper;
-import com.macro.mall.tiny.modules.ums.mapper.UmsResourceMapper;
-import com.macro.mall.tiny.modules.ums.mapper.UmsRoleMapper;
-import com.macro.mall.tiny.modules.ums.model.*;
-import com.macro.mall.tiny.modules.ums.service.UmsAdminCacheService;
-import com.macro.mall.tiny.modules.ums.service.UmsAdminRoleRelationService;
-import com.macro.mall.tiny.modules.ums.service.UmsAdminService;
-import com.macro.mall.security.util.JwtTokenUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import cn.hutool.core.util.StrUtil
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
+import com.macro.mall.security.util.JwtTokenUtil
+import com.macro.mall.tiny.common.exception.Asserts
+import com.macro.mall.tiny.domain.AdminUserDetails
+import com.macro.mall.tiny.modules.ums.dto.UmsAdminParam
+import com.macro.mall.tiny.modules.ums.dto.UpdateAdminPasswordParam
+import com.macro.mall.tiny.modules.ums.mapper.UmsAdminLoginLogMapper
+import com.macro.mall.tiny.modules.ums.mapper.UmsAdminMapper
+import com.macro.mall.tiny.modules.ums.mapper.UmsResourceMapper
+import com.macro.mall.tiny.modules.ums.mapper.UmsRoleMapper
+import com.macro.mall.tiny.modules.ums.model.*
+import com.macro.mall.tiny.modules.ums.service.UmsAdminCacheService
+import com.macro.mall.tiny.modules.ums.service.UmsAdminRoleRelationService
+import com.macro.mall.tiny.modules.ums.service.UmsAdminService
+import org.slf4j.LoggerFactory
+import org.springframework.beans.BeanUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
+import java.util.*
 
 /**
  * 后台管理员管理Service实现类
  * Created by macro on 2018/4/26.
  */
 @Service
-public class UmsAdminServiceImpl extends ServiceImpl<UmsAdminMapper,UmsAdmin> implements UmsAdminService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UmsAdminServiceImpl.class);
+class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminService {
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UmsAdminLoginLogMapper loginLogMapper;
-    @Autowired
-    private UmsAdminCacheService adminCacheService;
-    @Autowired
-    private UmsAdminRoleRelationService adminRoleRelationService;
-    @Autowired
-    private UmsRoleMapper roleMapper;
-    @Autowired
-    private UmsResourceMapper resourceMapper;
+    lateinit var jwtTokenUtil: JwtTokenUtil
 
-    @Override
-    public UmsAdmin getAdminByUsername(String username) {
-        UmsAdmin admin = adminCacheService.getAdmin(username);
-        if(admin!=null) return  admin;
-        QueryWrapper<UmsAdmin> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsAdmin::getUsername,username);
-        List<UmsAdmin> adminList = list(wrapper);
-        if (adminList != null && adminList.size() > 0) {
-            admin = adminList.get(0);
-            adminCacheService.setAdmin(admin);
-            return admin;
+    @Autowired
+    lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
+    lateinit var loginLogMapper: UmsAdminLoginLogMapper
+
+    @Autowired
+    lateinit var adminCacheService: UmsAdminCacheService
+
+    @Autowired
+    lateinit var adminRoleRelationService: UmsAdminRoleRelationService
+
+    @Autowired
+    lateinit var roleMapper: UmsRoleMapper
+
+    @Autowired
+    lateinit var resourceMapper: UmsResourceMapper
+
+    override fun getAdminByUsername(username: String): UmsAdmin? {
+        var admin = adminCacheService.getAdmin(username)
+        if (admin != null) return admin
+        val wrapper = QueryWrapper<UmsAdmin>()
+        wrapper.eq("username", username)
+        //wrapper.lambda().eq(UmsAdmin::username, username)
+        val adminList = list(wrapper)
+        if (adminList != null && adminList.size > 0) {
+            admin = adminList[0]
+            adminCacheService.setAdmin(admin)
+            return admin
         }
-        return null;
+        return null
     }
 
-    @Override
-    public UmsAdmin register(UmsAdminParam umsAdminParam) {
-        UmsAdmin umsAdmin = new UmsAdmin();
-        BeanUtils.copyProperties(umsAdminParam, umsAdmin);
-        umsAdmin.setCreateTime(new Date());
-        umsAdmin.setStatus(1);
-        //查询是否有相同用户名的用户
-        QueryWrapper<UmsAdmin> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsAdmin::getUsername,umsAdmin.getUsername());
-        List<UmsAdmin> umsAdminList = list(wrapper);
-        if (umsAdminList.size() > 0) {
-            return null;
+    override fun register(umsAdminParam: UmsAdminParam): UmsAdmin? {
+        val umsAdmin = UmsAdmin()
+        BeanUtils.copyProperties(umsAdminParam, umsAdmin)
+        umsAdmin.createTime = Date()
+        umsAdmin.status = 1 //查询是否有相同用户名的用户
+        val wrapper = QueryWrapper<UmsAdmin>()
+        wrapper.eq("username", umsAdmin.username)
+        //wrapper.lambda().eq(UmsAdmin::username, umsAdmin.username)
+        val umsAdminList = list(wrapper)
+        if (umsAdminList.size > 0) {
+            return null
         }
         //将密码进行加密操作
-        String encodePassword = passwordEncoder.encode(umsAdmin.getPassword());
-        umsAdmin.setPassword(encodePassword);
-        baseMapper.insert(umsAdmin);
-        return umsAdmin;
+        val encodePassword = passwordEncoder.encode(umsAdmin.password)
+        umsAdmin.password = encodePassword
+        baseMapper.insert(umsAdmin)
+        return umsAdmin
     }
 
-    @Override
-    public String login(String username, String password) {
-        String token = null;
+    override fun login(username: String, password: String): String {
+        var token = ""
         //密码需要客户端加密后传递
         try {
-            UserDetails userDetails = loadUserByUsername(username);
-            if(!passwordEncoder.matches(password,userDetails.getPassword())){
-                Asserts.fail("密码不正确");
+            val userDetails = loadUserByUsername(username)
+            if (!passwordEncoder.matches(password, userDetails.password)) {
+                Asserts.fail("密码不正确")
             }
-            if(!userDetails.isEnabled()){
-                Asserts.fail("帐号已被禁用");
+            if (!userDetails.isEnabled) {
+                Asserts.fail("帐号已被禁用")
             }
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            token = jwtTokenUtil.generateToken(userDetails);
-//            updateLoginTimeByUsername(username);
-            insertLoginLog(username);
-        } catch (AuthenticationException e) {
-            LOGGER.warn("登录异常:{}", e.getMessage());
+            val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+            SecurityContextHolder.getContext().authentication = authentication
+            token = jwtTokenUtil.generateToken(userDetails) //            updateLoginTimeByUsername(username);
+            insertLoginLog(username)
+        } catch (e: AuthenticationException) {
+            LOGGER.warn("登录异常:{}", e.message)
         }
-        return token;
+        return token
     }
 
     /**
      * 添加登录记录
      * @param username 用户名
      */
-    private void insertLoginLog(String username) {
-        UmsAdmin admin = getAdminByUsername(username);
-        if(admin==null) return;
-        UmsAdminLoginLog loginLog = new UmsAdminLoginLog();
-        loginLog.setAdminId(admin.getId());
-        loginLog.setCreateTime(new Date());
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        loginLog.setIp(request.getRemoteAddr());
-        loginLogMapper.insert(loginLog);
+    private fun insertLoginLog(username: String) {
+        val admin = getAdminByUsername(username) ?: return
+        val loginLog = UmsAdminLoginLog()
+        loginLog.adminId = admin.id
+        loginLog.createTime = Date()
+        val attributes = RequestContextHolder.getRequestAttributes() as ServletRequestAttributes
+        val request = attributes.request
+        loginLog.ip = request.remoteAddr
+        loginLogMapper.insert(loginLog)
     }
 
     /**
      * 根据用户名修改登录时间
      */
-    private void updateLoginTimeByUsername(String username) {
-        UmsAdmin record = new UmsAdmin();
-        record.setLoginTime(new Date());
-        QueryWrapper<UmsAdmin> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsAdmin::getUsername,username);
-        update(record,wrapper);
+    private fun updateLoginTimeByUsername(username: String) {
+        val record = UmsAdmin()
+        record.loginTime = Date()
+        val wrapper = QueryWrapper<UmsAdmin>()
+        wrapper.eq("username", username)
+        //wrapper.lambda().eq(UmsAdmin::username, username)
+        update(record, wrapper)
     }
 
-    @Override
-    public String refreshToken(String oldToken) {
-        return jwtTokenUtil.refreshHeadToken(oldToken);
+    override fun refreshToken(oldToken: String): String? {
+        return jwtTokenUtil.refreshHeadToken(oldToken)
     }
 
-    @Override
-    public Page<UmsAdmin> list(String keyword, Integer pageSize, Integer pageNum) {
-        Page<UmsAdmin> page = new Page<>(pageNum,pageSize);
-        QueryWrapper<UmsAdmin> wrapper = new QueryWrapper<>();
-        LambdaQueryWrapper<UmsAdmin> lambda = wrapper.lambda();
-        if(StrUtil.isNotEmpty(keyword)){
-            lambda.like(UmsAdmin::getUsername,keyword);
-            lambda.or().like(UmsAdmin::getNickName,keyword);
+    override fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsAdmin> {
+        val page = Page<UmsAdmin>(pageNum, pageSize)
+        val wrapper = QueryWrapper<UmsAdmin>()
+        if (!keyword.isNullOrBlank()) {
+            wrapper.like("username", keyword)
+            wrapper.or { wrapper.like("nick_name", keyword) }
         }
-        return page(page,wrapper);
+        return page(page, wrapper)
     }
 
-    @Override
-    public boolean update(Long id, UmsAdmin admin) {
-        admin.setId(id);
-        UmsAdmin rawAdmin = getById(id);
-        if(rawAdmin.getPassword().equals(admin.getPassword())){
-            //与原加密密码相同的不需要修改
-            admin.setPassword(null);
-        }else{
-            //与原加密密码不同的需要加密修改
-            if(StrUtil.isEmpty(admin.getPassword())){
-                admin.setPassword(null);
-            }else{
-                admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+    override fun update(id: Long, admin: UmsAdmin): Boolean {
+        admin.id = id
+        val rawAdmin = getById(id) ?: return false
+        if (rawAdmin.password == admin.password) { //与原加密密码相同的不需要修改
+            admin.password = null
+        } else { //与原加密密码不同的需要加密修改
+            if (StrUtil.isEmpty(admin.password)) {
+                admin.password = null
+            } else {
+                admin.password = passwordEncoder.encode(admin.password)
             }
         }
-        boolean success = updateById(admin);
-        adminCacheService.delAdmin(id);
-        return success;
+        val success = updateById(admin)
+        adminCacheService.delAdmin(id)
+        return success
     }
 
-    @Override
-    public boolean delete(Long id) {
-        adminCacheService.delAdmin(id);
-        boolean success = removeById(id);
-        adminCacheService.delResourceList(id);
-        return success;
+    override fun delete(id: Long): Boolean {
+        adminCacheService.delAdmin(id)
+        val success = removeById(id)
+        adminCacheService.delResourceList(id)
+        return success
     }
 
-    @Override
-    public int updateRole(Long adminId, List<Long> roleIds) {
-        int count = roleIds == null ? 0 : roleIds.size();
+    override fun updateRole(adminId: Long, roleIds: List<Long>): Int {
+        val count = roleIds.size
         //先删除原来的关系
-        QueryWrapper<UmsAdminRoleRelation> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsAdminRoleRelation::getAdminId,adminId);
-        adminRoleRelationService.remove(wrapper);
-        //建立新关系
-        if (!CollectionUtils.isEmpty(roleIds)) {
-            List<UmsAdminRoleRelation> list = new ArrayList<>();
-            for (Long roleId : roleIds) {
-                UmsAdminRoleRelation roleRelation = new UmsAdminRoleRelation();
-                roleRelation.setAdminId(adminId);
-                roleRelation.setRoleId(roleId);
-                list.add(roleRelation);
+        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
+        wrapper.eq("admin_id", adminId)
+        //wrapper.lambda().eq(UmsAdminRoleRelation::adminId, adminId)
+        adminRoleRelationService.remove(wrapper) //建立新关系
+        if (roleIds.isNotEmpty()) {
+            val list = mutableListOf<UmsAdminRoleRelation>()
+            for (roleId in roleIds) {
+                val roleRelation = UmsAdminRoleRelation(adminId, roleId)
+                list.add(roleRelation)
             }
-            adminRoleRelationService.saveBatch(list);
+            adminRoleRelationService.saveBatch(list)
         }
-        adminCacheService.delResourceList(adminId);
-        return count;
+        adminCacheService.delResourceList(adminId)
+        return count
     }
 
-    @Override
-    public List<UmsRole> getRoleList(Long adminId) {
-        return roleMapper.getRoleList(adminId);
+    override fun getRoleList(adminId: Long): List<UmsRole> {
+        return roleMapper.getRoleList(adminId)
     }
 
-    @Override
-    public List<UmsResource> getResourceList(Long adminId) {
-        List<UmsResource> resourceList = adminCacheService.getResourceList(adminId);
-        if(CollUtil.isNotEmpty(resourceList)){
-            return  resourceList;
+    override fun getResourceList(adminId: Long): List<UmsResource> {
+        var resourceList = adminCacheService.getResourceList(adminId)
+        if (!resourceList.isNullOrEmpty()) {
+            return resourceList
         }
-        resourceList = resourceMapper.getResourceList(adminId);
-        if(CollUtil.isNotEmpty(resourceList)){
-            adminCacheService.setResourceList(adminId,resourceList);
+        resourceList = resourceMapper.getResourceList(adminId)
+        if (resourceList.isNotEmpty()) {
+            adminCacheService.setResourceList(adminId, resourceList)
         }
-        return resourceList;
+        return resourceList
     }
 
-    @Override
-    public int updatePassword(UpdateAdminPasswordParam param) {
-        if(StrUtil.isEmpty(param.getUsername())
-                ||StrUtil.isEmpty(param.getOldPassword())
-                ||StrUtil.isEmpty(param.getNewPassword())){
-            return -1;
+    override fun updatePassword(param: UpdateAdminPasswordParam): Int {
+        if (param.username.isNullOrBlank()
+                ||  param.oldPassword.isNullOrBlank()
+                || param.newPassword.isNullOrBlank()) {
+            return -1
         }
-        QueryWrapper<UmsAdmin> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsAdmin::getUsername,param.getUsername());
-        List<UmsAdmin> adminList = list(wrapper);
-        if(CollUtil.isEmpty(adminList)){
-            return -2;
+        val wrapper = QueryWrapper<UmsAdmin>()
+        wrapper.eq("username", param.username)
+        //wrapper.lambda().eq(UmsAdmin::username, param.username)
+        val adminList = list(wrapper)
+        if (adminList.isEmpty()) {
+            return -2
         }
-        UmsAdmin umsAdmin = adminList.get(0);
-        if(!passwordEncoder.matches(param.getOldPassword(),umsAdmin.getPassword())){
-            return -3;
+        val umsAdmin = adminList[0] ?: return -2
+        if (!passwordEncoder.matches(param.oldPassword, umsAdmin.password)) {
+            return -3
         }
-        umsAdmin.setPassword(passwordEncoder.encode(param.getNewPassword()));
-        updateById(umsAdmin);
-        adminCacheService.delAdmin(umsAdmin.getId());
-        return 1;
+        umsAdmin.password = (passwordEncoder.encode(param.newPassword))
+        updateById(umsAdmin)
+        adminCacheService.delAdmin(umsAdmin.id)
+        return 1
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username){
-        //获取用户信息
-        UmsAdmin admin = getAdminByUsername(username);
+    override fun loadUserByUsername(username: String): UserDetails { //获取用户信息
+        val admin = getAdminByUsername(username)
         if (admin != null) {
-            List<UmsResource> resourceList = getResourceList(admin.getId());
-            return new AdminUserDetails(admin,resourceList);
+            val resourceList = getResourceList(admin.id)
+            return AdminUserDetails(admin, resourceList)
         }
-        throw new UsernameNotFoundException("用户名或密码错误");
+        throw UsernameNotFoundException("用户名或密码错误")
+    }
+
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(UmsAdminServiceImpl::class.java)
     }
 }

@@ -1,11 +1,11 @@
-package com.macro.mall.tiny.config;
+package com.macro.mall.tiny.config
 
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor
+import com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize
+import org.mybatis.spring.annotation.MapperScan
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.transaction.annotation.EnableTransactionManagement
 
 /**
  * MyBatis配置类
@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan({"com.macro.mall.tiny.modules.*.mapper"})
-public class MyBatisConfig {
+@MapperScan("com.macro.mall.tiny.modules.*.mapper")
+class MyBatisConfig {
     @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
-        paginationInterceptor.setCountSqlParser(new JsqlParserCountOptimize(true));
-        return paginationInterceptor;
+    fun paginationInterceptor(): PaginationInterceptor {
+        val paginationInterceptor = PaginationInterceptor()
+        paginationInterceptor.setCountSqlParser(JsqlParserCountOptimize(true))
+        return paginationInterceptor
     }
 }

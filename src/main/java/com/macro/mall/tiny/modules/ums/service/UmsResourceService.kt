@@ -1,34 +1,31 @@
-package com.macro.mall.tiny.modules.ums.service;
+package com.macro.mall.tiny.modules.ums.service
 
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.macro.mall.tiny.modules.ums.model.UmsResource;
-
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.baomidou.mybatisplus.extension.service.IService
+import com.macro.mall.tiny.modules.ums.model.UmsResource
 
 /**
  * 后台资源管理Service
  * Created by macro on 2020/2/2.
  */
-public interface UmsResourceService extends IService<UmsResource> {
+interface UmsResourceService : IService<UmsResource> {
     /**
      * 添加资源
      */
-    boolean create(UmsResource umsResource);
+    fun create(umsResource: UmsResource): Boolean
 
     /**
      * 修改资源
      */
-    boolean update(Long id, UmsResource umsResource);
+    fun update(id: Long, umsResource: UmsResource): Boolean
 
     /**
      * 删除资源
      */
-    boolean delete(Long id);
+    fun delete(id: Long): Boolean
 
     /**
      * 分页查询资源
      */
-    Page<UmsResource> list(Long categoryId, String nameKeyword, String urlKeyword, Integer pageSize, Integer pageNum);
+    fun list(categoryId: Long?, nameKeyword: String?, urlKeyword: String?, pageSize: Long, pageNum: Long): Page<UmsResource>
 }

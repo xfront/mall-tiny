@@ -1,33 +1,20 @@
-package com.macro.mall.tiny.common.exception;
+package com.macro.mall.tiny.common.exception
 
-
-import com.macro.mall.tiny.common.api.IErrorCode;
+import com.macro.mall.tiny.common.api.IErrorCode
 
 /**
  * 自定义API异常
  * Created by macro on 2020/2/27.
  */
-public class ApiException extends RuntimeException {
-    private IErrorCode errorCode;
+class ApiException : RuntimeException {
+    var errorCode: IErrorCode? = null
+        private set
 
-    public ApiException(IErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    constructor(errorCode: IErrorCode) : super(errorCode.message) {
+        this.errorCode = errorCode
     }
 
-    public ApiException(String message) {
-        super(message);
-    }
-
-    public ApiException(Throwable cause) {
-        super(cause);
-    }
-
-    public ApiException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public IErrorCode getErrorCode() {
-        return errorCode;
-    }
+    constructor(message: String?) : super(message) {}
+    constructor(cause: Throwable?) : super(cause) {}
+    constructor(message: String?, cause: Throwable?) : super(message, cause) {}
 }

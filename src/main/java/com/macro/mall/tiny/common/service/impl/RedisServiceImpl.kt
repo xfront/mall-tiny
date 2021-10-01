@@ -1,197 +1,186 @@
-package com.macro.mall.tiny.common.service.impl;
+package com.macro.mall.tiny.common.service.impl
 
-import com.macro.mall.tiny.common.service.RedisService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import com.macro.mall.tiny.common.service.RedisService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit
 
 /**
  * redis操作实现类
  * Created by macro on 2020/3/3.
  */
-public class RedisServiceImpl implements RedisService {
+@Component
+class RedisServiceImpl : RedisService {
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    lateinit var redisTemplate: RedisTemplate<String, Any?>
 
-    @Override
-    public void set(String key, Object value, long time) {
-        redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+    override fun set(key: String, value: Any, time: Long) {
+        redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS)
     }
 
-    @Override
-    public void set(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value);
+    override fun set(key: String, value: Any) {
+        redisTemplate.opsForValue().set(key, value)
     }
 
-    @Override
-    public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+    override fun get(key: String): Any? {
+        return redisTemplate.opsForValue().get(key)
     }
 
-    @Override
-    public Boolean del(String key) {
-        return redisTemplate.delete(key);
+    override fun del(key: String): Boolean {
+        return redisTemplate.delete(key)
     }
 
-    @Override
-    public Long del(List<String> keys) {
-        return redisTemplate.delete(keys);
+    override fun del(keys: List<String>): Long {
+        return redisTemplate.delete(keys)
     }
 
-    @Override
-    public Boolean expire(String key, long time) {
-        return redisTemplate.expire(key, time, TimeUnit.SECONDS);
+    override fun expire(key: String, time: Long): Boolean {
+        return redisTemplate.expire(key, time, TimeUnit.SECONDS)
     }
 
-    @Override
-    public Long getExpire(String key) {
-        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    override fun getExpire(key: String): Long {
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS)
     }
 
-    @Override
-    public Boolean hasKey(String key) {
-        return redisTemplate.hasKey(key);
+    override fun hasKey(key: String): Boolean {
+        return redisTemplate.hasKey(key)
     }
 
-    @Override
-    public Long incr(String key, long delta) {
-        return redisTemplate.opsForValue().increment(key, delta);
+    override fun incr(key: String, delta: Long): Long? {
+        return redisTemplate.opsForValue()
+                .increment(key, delta)
     }
 
-    @Override
-    public Long decr(String key, long delta) {
-        return redisTemplate.opsForValue().increment(key, -delta);
+    override fun decr(key: String, delta: Long): Long? {
+        return redisTemplate.opsForValue()
+                .increment(key, -delta)
     }
 
-    @Override
-    public Object hGet(String key, String hashKey) {
-        return redisTemplate.opsForHash().get(key, hashKey);
+    override fun hGet(key: String, hashKey: String): Any? {
+        return redisTemplate.opsForHash<Any, Any>()[key, hashKey]
     }
 
-    @Override
-    public Boolean hSet(String key, String hashKey, Object value, long time) {
-        redisTemplate.opsForHash().put(key, hashKey, value);
-        return expire(key, time);
+    override fun hSet(key: String, hashKey: String, value: Any, time: Long): Boolean {
+        redisTemplate.opsForHash<Any, Any>()
+                .put(key, hashKey, value)
+        return expire(key, time)
     }
 
-    @Override
-    public void hSet(String key, String hashKey, Object value) {
-        redisTemplate.opsForHash().put(key, hashKey, value);
+    override fun hSet(key: String, hashKey: String, value: Any) {
+        redisTemplate.opsForHash<Any, Any>()
+                .put(key, hashKey, value)
     }
 
-    @Override
-    public Map<Object, Object> hGetAll(String key) {
-        return redisTemplate.opsForHash().entries(key);
+    override fun hGetAll(key: String): Map<Any, Any> {
+        return redisTemplate.opsForHash<Any, Any>()
+                .entries(key)
     }
 
-    @Override
-    public Boolean hSetAll(String key, Map<String, Object> map, long time) {
-        redisTemplate.opsForHash().putAll(key, map);
-        return expire(key, time);
+    override fun hSetAll(key: String, map: Map<String, Any>, time: Long): Boolean {
+        redisTemplate.opsForHash<Any, Any>()
+                .putAll(key, map)
+        return expire(key, time)
     }
 
-    @Override
-    public void hSetAll(String key, Map<String, ?> map) {
-        redisTemplate.opsForHash().putAll(key, map);
+    override fun hSetAll(key: String, map: Map<String, *>) {
+        redisTemplate.opsForHash<Any, Any>()
+                .putAll(key, map)
     }
 
-    @Override
-    public void hDel(String key, Object... hashKey) {
-        redisTemplate.opsForHash().delete(key, hashKey);
+    override fun hDel(key: String, vararg hashKey: Any) {
+        redisTemplate.opsForHash<Any, Any>()
+                .delete(key, *hashKey)
     }
 
-    @Override
-    public Boolean hHasKey(String key, String hashKey) {
-        return redisTemplate.opsForHash().hasKey(key, hashKey);
+    override fun hHasKey(key: String, hashKey: String): Boolean {
+        return redisTemplate.opsForHash<Any, Any>()
+                .hasKey(key, hashKey)
     }
 
-    @Override
-    public Long hIncr(String key, String hashKey, Long delta) {
-        return redisTemplate.opsForHash().increment(key, hashKey, delta);
+    override fun hIncr(key: String, hashKey: String, delta: Long): Long {
+        return redisTemplate.opsForHash<Any, Any>()
+                .increment(key, hashKey, delta)
     }
 
-    @Override
-    public Long hDecr(String key, String hashKey, Long delta) {
-        return redisTemplate.opsForHash().increment(key, hashKey, -delta);
+    override fun hDecr(key: String, hashKey: String, delta: Long): Long {
+        return redisTemplate.opsForHash<Any, Any>()
+                .increment(key, hashKey, -delta)
     }
 
-    @Override
-    public Set<Object> sMembers(String key) {
-        return redisTemplate.opsForSet().members(key);
+    override fun sMembers(key: String): Set<Any>? {
+        return redisTemplate.opsForSet()
+                .members(key)?.filterNotNull()?.toHashSet()
     }
 
-    @Override
-    public Long sAdd(String key, Object... values) {
-        return redisTemplate.opsForSet().add(key, values);
+    override fun sAdd(key: String, vararg values: Any): Long? {
+        return redisTemplate.opsForSet()
+                .add(key, *values)
     }
 
-    @Override
-    public Long sAdd(String key, long time, Object... values) {
-        Long count = redisTemplate.opsForSet().add(key, values);
-        expire(key, time);
-        return count;
+    override fun sAdd(key: String, time: Long, vararg values: Any): Long? {
+        val count = redisTemplate.opsForSet()
+                .add(key, *values)
+        expire(key, time)
+        return count
     }
 
-    @Override
-    public Boolean sIsMember(String key, Object value) {
-        return redisTemplate.opsForSet().isMember(key, value);
+    override fun sIsMember(key: String, value: Any): Boolean? {
+        return redisTemplate.opsForSet()
+                .isMember(key, value)
     }
 
-    @Override
-    public Long sSize(String key) {
-        return redisTemplate.opsForSet().size(key);
+    override fun sSize(key: String): Long? {
+        return redisTemplate.opsForSet()
+                .size(key)
     }
 
-    @Override
-    public Long sRemove(String key, Object... values) {
-        return redisTemplate.opsForSet().remove(key, values);
+    override fun sRemove(key: String, vararg values: Any?): Long? {
+        return redisTemplate.opsForSet()
+                .remove(key, *values)
     }
 
-    @Override
-    public List<Object> lRange(String key, long start, long end) {
-        return redisTemplate.opsForList().range(key, start, end);
+    override fun lRange(key: String, start: Long, end: Long): List<Any>? {
+        return redisTemplate.opsForList()
+                .range(key, start, end)?.filterNotNull()
     }
 
-    @Override
-    public Long lSize(String key) {
-        return redisTemplate.opsForList().size(key);
+    override fun lSize(key: String): Long? {
+        return redisTemplate.opsForList()
+                .size(key)
     }
 
-    @Override
-    public Object lIndex(String key, long index) {
-        return redisTemplate.opsForList().index(key, index);
+    override fun lIndex(key: String, index: Long): Any? {
+        return redisTemplate.opsForList()
+                .index(key, index)
     }
 
-    @Override
-    public Long lPush(String key, Object value) {
-        return redisTemplate.opsForList().rightPush(key, value);
+    override fun lPush(key: String, value: Any): Long? {
+        return redisTemplate.opsForList()
+                .rightPush(key, value)
     }
 
-    @Override
-    public Long lPush(String key, Object value, long time) {
-        Long index = redisTemplate.opsForList().rightPush(key, value);
-        expire(key, time);
-        return index;
+    override fun lPush(key: String, value: Any, time: Long): Long? {
+        val index = redisTemplate.opsForList()
+                .rightPush(key, value)
+        expire(key, time)
+        return index
     }
 
-    @Override
-    public Long lPushAll(String key, Object... values) {
-        return redisTemplate.opsForList().rightPushAll(key, values);
+    override fun lPushAll(key: String, vararg values: Any): Long? {
+        return redisTemplate.opsForList()
+                .rightPushAll(key, *values)
     }
 
-    @Override
-    public Long lPushAll(String key, Long time, Object... values) {
-        Long count = redisTemplate.opsForList().rightPushAll(key, values);
-        expire(key, time);
-        return count;
+    override fun lPushAll(key: String, time: Long, vararg values: Any): Long? {
+        val count = redisTemplate.opsForList()
+                .rightPushAll(key, *values)
+        expire(key, time)
+        return count
     }
 
-    @Override
-    public Long lRemove(String key, long count, Object value) {
-        return redisTemplate.opsForList().remove(key, count, value);
+    override fun lRemove(key: String, count: Long, value: Any): Long? {
+        return redisTemplate.opsForList()
+                .remove(key, count, value)
     }
 }

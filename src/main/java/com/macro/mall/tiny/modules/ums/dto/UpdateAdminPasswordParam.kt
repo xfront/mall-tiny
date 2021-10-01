@@ -1,25 +1,22 @@
-package com.macro.mall.tiny.modules.ums.dto;
+package com.macro.mall.tiny.modules.ums.dto
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.validation.constraints.NotEmpty;
+import io.swagger.annotations.ApiModelProperty
+import javax.validation.constraints.NotEmpty
 
 /**
  * 修改用户名密码参数
  * Created by macro on 2019/10/9.
  */
-@Getter
-@Setter
-public class UpdateAdminPasswordParam {
+data class UpdateAdminPasswordParam(
     @NotEmpty
     @ApiModelProperty(value = "用户名", required = true)
-    private String username;
+    var username: String = "",
+
     @NotEmpty
     @ApiModelProperty(value = "旧密码", required = true)
-    private String oldPassword;
+    var oldPassword: String = "",
+
     @NotEmpty
     @ApiModelProperty(value = "新密码", required = true)
-    private String newPassword;
-}
+    var newPassword: String = "",
+)

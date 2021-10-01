@@ -1,58 +1,56 @@
-package com.macro.mall.tiny.modules.ums.service;
+package com.macro.mall.tiny.modules.ums.service
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.macro.mall.tiny.modules.ums.model.UmsMenu;
-import com.macro.mall.tiny.modules.ums.model.UmsResource;
-import com.macro.mall.tiny.modules.ums.model.UmsRole;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.baomidou.mybatisplus.extension.service.IService
+import com.macro.mall.tiny.modules.ums.model.UmsMenu
+import com.macro.mall.tiny.modules.ums.model.UmsResource
+import com.macro.mall.tiny.modules.ums.model.UmsRole
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * 后台角色管理Service
  * Created by macro on 2018/9/30.
  */
-public interface UmsRoleService extends IService<UmsRole> {
+interface UmsRoleService : IService<UmsRole?> {
     /**
      * 添加角色
      */
-    boolean create(UmsRole role);
+    fun create(role: UmsRole): Boolean
 
     /**
      * 批量删除角色
      */
-    boolean delete(List<Long> ids);
+    fun delete(ids: List<Long>): Boolean
 
     /**
      * 分页获取角色列表
      */
-    Page<UmsRole> list(String keyword, Integer pageSize, Integer pageNum);
+    fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsRole>
 
     /**
      * 根据管理员ID获取对应菜单
      */
-    List<UmsMenu> getMenuList(Long adminId);
+    fun getMenuList(adminId: Long): List<UmsMenu>
 
     /**
      * 获取角色相关菜单
      */
-    List<UmsMenu> listMenu(Long roleId);
+    fun listMenu(roleId: Long): List<UmsMenu>
 
     /**
      * 获取角色相关资源
      */
-    List<UmsResource> listResource(Long roleId);
+    fun listResource(roleId: Long): List<UmsResource>
 
     /**
      * 给角色分配菜单
      */
     @Transactional
-    int allocMenu(Long roleId, List<Long> menuIds);
+    fun allocMenu(roleId: Long, menuIds: List<Long>): Int
 
     /**
      * 给角色分配资源
      */
     @Transactional
-    int allocResource(Long roleId, List<Long> resourceIds);
+    fun allocResource(roleId: Long, resourceIds: List<Long>): Int
 }

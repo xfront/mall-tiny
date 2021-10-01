@@ -1,57 +1,54 @@
-package com.macro.mall.tiny.modules.ums.model;
+package com.macro.mall.tiny.modules.ums.model
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.baomidou.mybatisplus.annotation.IdType
+import com.baomidou.mybatisplus.annotation.TableId
+import com.baomidou.mybatisplus.annotation.TableName
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+import java.io.Serializable
+import java.util.*
 
 /**
- * <p>
+ *
+ *
  * 后台菜单表
- * </p>
+ *
  *
  * @author macro
  * @since 2020-08-21
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
+
 @TableName("ums_menu")
-@ApiModel(value="UmsMenu对象", description="后台菜单表")
-public class UmsMenu implements Serializable {
-
-    private static final long serialVersionUID=1L;
-
+@ApiModel(value = "UmsMenu对象", description = "后台菜单表")
+open class UmsMenu : Serializable {
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    var id: Long = -1
 
     @ApiModelProperty(value = "父级ID")
-    private Long parentId;
+    var parentId: Long = 0
 
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    var createTime: Date? = null
 
     @ApiModelProperty(value = "菜单名称")
-    private String title;
+    var title: String? = null
 
     @ApiModelProperty(value = "菜单级数")
-    private Integer level;
+    var level: Int = 0
 
     @ApiModelProperty(value = "菜单排序")
-    private Integer sort;
+    var sort: Int? = null
 
     @ApiModelProperty(value = "前端名称")
-    private String name;
+    var name: String? = null
 
     @ApiModelProperty(value = "前端图标")
-    private String icon;
+    var icon: String? = null
 
     @ApiModelProperty(value = "前端隐藏")
-    private Integer hidden;
+    var hidden: Int? = null
 
-
+    companion object {
+        private const val serialVersionUID = 1L
+    }
 }

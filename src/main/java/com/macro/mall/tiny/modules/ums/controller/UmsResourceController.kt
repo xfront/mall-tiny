@@ -1,98 +1,98 @@
-package com.macro.mall.tiny.modules.ums.controller;
+package com.macro.mall.tiny.modules.ums.controller
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.macro.mall.tiny.common.api.CommonPage;
-import com.macro.mall.tiny.common.api.CommonResult;
-import com.macro.mall.tiny.modules.ums.model.UmsResource;
-import com.macro.mall.tiny.modules.ums.service.UmsResourceService;
-import com.macro.mall.tiny.security.component.DynamicSecurityMetadataSource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.macro.mall.tiny.common.api.CommonPage
+import com.macro.mall.tiny.common.api.CommonResult
+import com.macro.mall.tiny.modules.ums.model.UmsResource
+import com.macro.mall.tiny.modules.ums.service.UmsResourceService
+import com.macro.mall.tiny.security.component.DynamicSecurityMetadataSource
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.*
 
 /**
  * 后台资源管理Controller
  * Created by macro on 2020/2/4.
  */
 @Controller
-@Api(tags = "UmsResourceController", description = "后台资源管理")
+@Api(tags = ["UmsResourceController"], description = "后台资源管理")
 @RequestMapping("/resource")
-public class UmsResourceController {
+class UmsResourceController {
+    @Autowired
+    lateinit var resourceService: UmsResourceService
 
     @Autowired
-    private UmsResourceService resourceService;
-    @Autowired
-    private DynamicSecurityMetadataSource dynamicSecurityMetadataSource;
+    lateinit var dynamicSecurityMetadataSource: DynamicSecurityMetadataSource
 
     @ApiOperation("添加后台资源")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = ["/create"], method = [RequestMethod.POST])
     @ResponseBody
-    public CommonResult create(@RequestBody UmsResource umsResource) {
-        boolean success = resourceService.create(umsResource);
-        dynamicSecurityMetadataSource.clearDataSource();
-        if (success) {
-            return CommonResult.success(null);
+    fun create(@RequestBody umsResource: UmsResource): CommonResult<Any> {
+        val success = resourceService.create(umsResource)
+        dynamicSecurityMetadataSource.clearDataSource()
+        return if (success) {
+            CommonResult.success(null)
         } else {
-            return CommonResult.failed();
+            CommonResult.failed()
         }
     }
 
     @ApiOperation("修改后台资源")
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = ["/update/{id}"], method = [RequestMethod.POST])
     @ResponseBody
-    public CommonResult update(@PathVariable Long id,
-                               @RequestBody UmsResource umsResource) {
-        boolean success = resourceService.update(id, umsResource);
-        dynamicSecurityMetadataSource.clearDataSource();
-        if (success) {
-            return CommonResult.success(null);
+    fun update(
+        @PathVariable id: Long, @RequestBody umsResource: UmsResource
+    ): CommonResult<Any> {
+        val success = resourceService.update(id, umsResource)
+        dynamicSecurityMetadataSource.clearDataSource()
+        return if (success) {
+            CommonResult.success(null)
         } else {
-            return CommonResult.failed();
+            CommonResult.failed()
         }
     }
 
     @ApiOperation("根据ID获取资源详情")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ["/{id}"], method = [RequestMethod.GET])
     @ResponseBody
-    public CommonResult<UmsResource> getItem(@PathVariable Long id) {
-        UmsResource umsResource = resourceService.getById(id);
-        return CommonResult.success(umsResource);
+    fun getItem(@PathVariable id: Long?): CommonResult<UmsResource?> {
+        val umsResource = resourceService.getById(id)
+        return CommonResult.success<UmsResource?>(umsResource)
     }
 
     @ApiOperation("根据ID删除后台资源")
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = ["/delete/{id}"], method = [RequestMethod.POST])
     @ResponseBody
-    public CommonResult delete(@PathVariable Long id) {
-        boolean success = resourceService.delete(id);
-        dynamicSecurityMetadataSource.clearDataSource();
-        if (success) {
-            return CommonResult.success(null);
+    fun delete(@PathVariable id: Long): CommonResult<Any> {
+        val success = resourceService.delete(id)
+        dynamicSecurityMetadataSource.clearDataSource()
+        return if (success) {
+            CommonResult.success(null)
         } else {
-            return CommonResult.failed();
+            CommonResult.failed()
         }
     }
 
     @ApiOperation("分页模糊查询后台资源")
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = ["/list"], method = [RequestMethod.GET])
     @ResponseBody
-    public CommonResult<CommonPage<UmsResource>> list(@RequestParam(required = false) Long categoryId,
-                                                      @RequestParam(required = false) String nameKeyword,
-                                                      @RequestParam(required = false) String urlKeyword,
-                                                      @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
-                                                      @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
-        Page<UmsResource> resourceList = resourceService.list(categoryId,nameKeyword, urlKeyword, pageSize, pageNum);
-        return CommonResult.success(CommonPage.restPage(resourceList));
+    fun list(
+        @RequestParam(required = false) categoryId: Long?,
+        @RequestParam(required = false) nameKeyword: String?,
+        @RequestParam(required = false) urlKeyword: String?,
+        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Long,
+        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Long
+    ): CommonResult<CommonPage<UmsResource>> {
+        val resourceList = resourceService.list(categoryId, nameKeyword, urlKeyword, pageSize, pageNum)
+        return CommonResult.success(CommonPage.restPage(resourceList))
     }
 
     @ApiOperation("查询所有后台资源")
-    @RequestMapping(value = "/listAll", method = RequestMethod.GET)
+    @RequestMapping(value = ["/listAll"], method = [RequestMethod.GET])
     @ResponseBody
-    public CommonResult<List<UmsResource>> listAll() {
-        List<UmsResource> resourceList = resourceService.list();
-        return CommonResult.success(resourceList);
+    fun listAll(): CommonResult<List<UmsResource>> {
+        val resourceList = resourceService.list()
+        return CommonResult.success(resourceList)
     }
 }

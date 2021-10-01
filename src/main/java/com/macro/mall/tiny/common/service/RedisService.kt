@@ -1,182 +1,177 @@
-package com.macro.mall.tiny.common.service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+package com.macro.mall.tiny.common.service
 
 /**
  * redis操作Service
  * Created by macro on 2020/3/3.
  */
-public interface RedisService {
+interface RedisService {
+    /**
+     * 保存属性
+     */
+    operator fun set(key: String, value: Any, time: Long)
 
     /**
      * 保存属性
      */
-    void set(String key, Object value, long time);
-
-    /**
-     * 保存属性
-     */
-    void set(String key, Object value);
+    operator fun set(key: String, value: Any)
 
     /**
      * 获取属性
      */
-    Object get(String key);
+    operator fun get(key: String): Any?
 
     /**
      * 删除属性
      */
-    Boolean del(String key);
+    fun del(key: String): Boolean
 
     /**
      * 批量删除属性
      */
-    Long del(List<String> keys);
+    fun del(keys: List<String>): Long
 
     /**
      * 设置过期时间
      */
-    Boolean expire(String key, long time);
+    fun expire(key: String, time: Long): Boolean
 
     /**
      * 获取过期时间
      */
-    Long getExpire(String key);
+    fun getExpire(key: String): Long
 
     /**
      * 判断是否有该属性
      */
-    Boolean hasKey(String key);
+    fun hasKey(key: String): Boolean
 
     /**
      * 按delta递增
      */
-    Long incr(String key, long delta);
+    fun incr(key: String, delta: Long): Long?
 
     /**
      * 按delta递减
      */
-    Long decr(String key, long delta);
+    fun decr(key: String, delta: Long): Long?
 
     /**
      * 获取Hash结构中的属性
      */
-    Object hGet(String key, String hashKey);
+    fun hGet(key: String, hashKey: String): Any?
 
     /**
      * 向Hash结构中放入一个属性
      */
-    Boolean hSet(String key, String hashKey, Object value, long time);
+    fun hSet(key: String, hashKey: String, value: Any, time: Long): Boolean
 
     /**
      * 向Hash结构中放入一个属性
      */
-    void hSet(String key, String hashKey, Object value);
+    fun hSet(key: String, hashKey: String, value: Any)
 
     /**
      * 直接获取整个Hash结构
      */
-    Map<Object, Object> hGetAll(String key);
+    fun hGetAll(key: String): Map<Any, Any>
 
     /**
      * 直接设置整个Hash结构
      */
-    Boolean hSetAll(String key, Map<String, Object> map, long time);
+    fun hSetAll(key: String, map: Map<String, Any>, time: Long): Boolean
 
     /**
      * 直接设置整个Hash结构
      */
-    void hSetAll(String key, Map<String, ?> map);
+    fun hSetAll(key: String, map: Map<String, *>)
 
     /**
      * 删除Hash结构中的属性
      */
-    void hDel(String key, Object... hashKey);
+    fun hDel(key: String, vararg hashKey: Any)
 
     /**
      * 判断Hash结构中是否有该属性
      */
-    Boolean hHasKey(String key, String hashKey);
+    fun hHasKey(key: String, hashKey: String): Boolean
 
     /**
      * Hash结构中属性递增
      */
-    Long hIncr(String key, String hashKey, Long delta);
+    fun hIncr(key: String, hashKey: String, delta: Long): Long
 
     /**
      * Hash结构中属性递减
      */
-    Long hDecr(String key, String hashKey, Long delta);
+    fun hDecr(key: String, hashKey: String, delta: Long): Long
 
     /**
      * 获取Set结构
      */
-    Set<Object> sMembers(String key);
+    fun sMembers(key: String): Set<Any>?
 
     /**
      * 向Set结构中添加属性
      */
-    Long sAdd(String key, Object... values);
+    fun sAdd(key: String, vararg values: Any): Long?
 
     /**
      * 向Set结构中添加属性
      */
-    Long sAdd(String key, long time, Object... values);
+    fun sAdd(key: String, time: Long, vararg values: Any): Long?
 
     /**
      * 是否为Set中的属性
      */
-    Boolean sIsMember(String key, Object value);
+    fun sIsMember(key: String, value: Any): Boolean?
 
     /**
      * 获取Set结构的长度
      */
-    Long sSize(String key);
+    fun sSize(key: String): Long?
 
     /**
      * 删除Set结构中的属性
      */
-    Long sRemove(String key, Object... values);
+    fun sRemove(key: String, vararg values: Any?): Long?
 
     /**
      * 获取List结构中的属性
      */
-    List<Object> lRange(String key, long start, long end);
+    fun lRange(key: String, start: Long, end: Long): List<Any>?
 
     /**
      * 获取List结构的长度
      */
-    Long lSize(String key);
+    fun lSize(key: String): Long?
 
     /**
      * 根据索引获取List中的属性
      */
-    Object lIndex(String key, long index);
+    fun lIndex(key: String, index: Long): Any?
 
     /**
      * 向List结构中添加属性
      */
-    Long lPush(String key, Object value);
+    fun lPush(key: String, value: Any): Long?
 
     /**
      * 向List结构中添加属性
      */
-    Long lPush(String key, Object value, long time);
+    fun lPush(key: String, value: Any, time: Long): Long?
 
     /**
      * 向List结构中批量添加属性
      */
-    Long lPushAll(String key, Object... values);
+    fun lPushAll(key: String, vararg values: Any): Long?
 
     /**
      * 向List结构中批量添加属性
      */
-    Long lPushAll(String key, Long time, Object... values);
+    fun lPushAll(key: String, time: Long, vararg values: Any): Long?
 
     /**
      * 从List结构中移除属性
      */
-    Long lRemove(String key, long count, Object value);
+    fun lRemove(key: String, count: Long, value: Any): Long?
 }

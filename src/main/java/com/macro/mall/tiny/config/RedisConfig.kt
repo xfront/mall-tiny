@@ -1,8 +1,8 @@
-package com.macro.mall.tiny.config;
+package com.macro.mall.tiny.config
 
-import com.macro.mall.tiny.common.config.BaseRedisConfig;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Configuration;
+import com.macro.mall.tiny.common.config.BaseRedisConfig
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.Configuration
 
 /**
  * Redis配置类
@@ -10,6 +10,4 @@ import org.springframework.context.annotation.Configuration;
  */
 @EnableCaching
 @Configuration
-public class RedisConfig extends BaseRedisConfig {
-
-}
+class RedisConfig : BaseRedisConfig()

@@ -1,40 +1,37 @@
-package com.macro.mall.tiny.modules.ums.service;
+package com.macro.mall.tiny.modules.ums.service
 
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.macro.mall.tiny.modules.ums.dto.UmsMenuNode;
-import com.macro.mall.tiny.modules.ums.model.UmsMenu;
-
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.baomidou.mybatisplus.extension.service.IService
+import com.macro.mall.tiny.modules.ums.dto.UmsMenuNode
+import com.macro.mall.tiny.modules.ums.model.UmsMenu
 
 /**
  * 后台菜单管理Service
  * Created by macro on 2020/2/2.
  */
-public interface UmsMenuService extends IService<UmsMenu> {
+interface UmsMenuService : IService<UmsMenu> {
     /**
      * 创建后台菜单
      */
-    boolean create(UmsMenu umsMenu);
+    fun create(umsMenu: UmsMenu): Boolean
 
     /**
      * 修改后台菜单
      */
-    boolean update(Long id, UmsMenu umsMenu);
+    fun update(id: Long, umsMenu: UmsMenu): Boolean
 
     /**
      * 分页查询后台菜单
      */
-    Page<UmsMenu> list(Long parentId, Integer pageSize, Integer pageNum);
+    fun list(parentId: Long, pageSize: Long, pageNum: Long): Page<UmsMenu>
 
     /**
      * 树形结构返回所有菜单列表
      */
-    List<UmsMenuNode> treeList();
+    fun treeList(): List<UmsMenuNode>
 
     /**
      * 修改菜单显示状态
      */
-    boolean updateHidden(Long id, Integer hidden);
+    fun updateHidden(id: Long, hidden: Int): Boolean
 }

@@ -1,58 +1,47 @@
-package com.macro.mall.tiny.modules.ums.model;
+package com.macro.mall.tiny.modules.ums.model
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.baomidou.mybatisplus.annotation.IdType
+import com.baomidou.mybatisplus.annotation.TableId
+import com.baomidou.mybatisplus.annotation.TableName
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+import java.io.Serializable
+import java.util.*
 
 /**
- * <p>
+ *
+ *
  * 后台用户表
- * </p>
+ *
  *
  * @author macro
  * @since 2020-08-21
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
+
 @TableName("ums_admin")
-@ApiModel(value="UmsAdmin对象", description="后台用户表")
-public class UmsAdmin implements Serializable {
-
-    private static final long serialVersionUID=1L;
-
+@ApiModel(value = "UmsAdmin对象", description = "后台用户表")
+class UmsAdmin : Serializable {
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-
-    private String username;
-
-    private String password;
-
+    var id: Long = 0
+    var username: String = ""
+    var password: String? = null
     @ApiModelProperty(value = "头像")
-    private String icon;
-
+    var icon: String? = null
     @ApiModelProperty(value = "邮箱")
-    private String email;
-
+    var email: String? = null
     @ApiModelProperty(value = "昵称")
-    private String nickName;
-
+    var nickName: String? = null
     @ApiModelProperty(value = "备注信息")
-    private String note;
-
+    var note: String? = null
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
-
+    var createTime: Date? = null
     @ApiModelProperty(value = "最后登录时间")
-    private Date loginTime;
-
+    var loginTime: Date? = null
     @ApiModelProperty(value = "帐号启用状态：0->禁用；1->启用")
-    private Integer status;
+    var status: Int? = null
 
 
+    override fun toString(): String {
+        return """UmsAdmin{id=$id, username=$username, password=$password, icon=$icon, email=$email, nickName=$nickName, note=$note, createTime=$createTime, loginTime=$loginTime, status=$status}"""
+    }
 }

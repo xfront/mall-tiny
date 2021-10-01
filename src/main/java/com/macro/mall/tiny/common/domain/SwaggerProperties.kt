@@ -1,47 +1,47 @@
-package com.macro.mall.tiny.common.domain;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+package com.macro.mall.tiny.common.domain
 
 /**
  * Swagger自定义配置
  * Created by macro on 2020/7/16.
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
-@Builder
-public class SwaggerProperties {
+class SwaggerProperties {
     /**
      * API文档生成基础路径
      */
-    private String apiBasePackage;
+    lateinit var apiBasePackage: String
+
     /**
      * 是否要启用登录认证
      */
-    private boolean enableSecurity;
+    var enableSecurity = false
+
     /**
      * 文档标题
      */
-    private String title;
+    var title: String? = null
+
     /**
      * 文档描述
      */
-    private String description;
+    var description: String? = null
+
     /**
      * 文档版本
      */
-    private String version;
+    var version: String? = null
+
     /**
      * 文档联系人姓名
      */
-    private String contactName;
+    var contactName: String? = null
+
     /**
      * 文档联系人网址
      */
-    private String contactUrl;
+    var contactUrl: String? = null
+
     /**
      * 文档联系人邮箱
      */
-    private String contactEmail;
+    var contactEmail: String? = null
 }
