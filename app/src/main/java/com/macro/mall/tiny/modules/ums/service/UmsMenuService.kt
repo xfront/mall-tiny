@@ -1,15 +1,15 @@
 package com.macro.mall.tiny.modules.ums.service
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import com.baomidou.mybatisplus.extension.service.IService
-import com.macro.mall.tiny.modules.ums.dto.UmsMenuNode
+import com.github.xfront.ktormplus.IPage
+import com.github.xfront.ktormplus.IService
 import com.macro.mall.tiny.modules.ums.model.UmsMenu
+import com.macro.mall.tiny.modules.ums.model.UmsMenus
 
 /**
  * 后台菜单管理Service
  * Created by macro on 2020/2/2.
  */
-interface UmsMenuService : IService<UmsMenu> {
+interface UmsMenuService : IService<UmsMenu, UmsMenus> {
     /**
      * 创建后台菜单
      */
@@ -23,12 +23,12 @@ interface UmsMenuService : IService<UmsMenu> {
     /**
      * 分页查询后台菜单
      */
-    fun list(parentId: Long, pageSize: Long, pageNum: Long): Page<UmsMenu>
+    fun list(parentId: Long, pageSize: Int, pageNum: Int): IPage<UmsMenu>
 
     /**
      * 树形结构返回所有菜单列表
      */
-    fun treeList(): List<UmsMenuNode>
+    fun treeList(): List<UmsMenu>
 
     /**
      * 修改菜单显示状态

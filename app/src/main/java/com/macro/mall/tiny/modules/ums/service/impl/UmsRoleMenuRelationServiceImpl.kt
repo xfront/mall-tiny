@@ -1,8 +1,9 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
+import com.github.xfront.ktormplus.ServiceImpl
 import com.macro.mall.tiny.modules.ums.mapper.UmsRoleMenuRelationMapper
 import com.macro.mall.tiny.modules.ums.model.UmsRoleMenuRelation
+import com.macro.mall.tiny.modules.ums.model.UmsRoleMenuRelations
 import com.macro.mall.tiny.modules.ums.service.UmsRoleMenuRelationService
 import org.springframework.stereotype.Service
 
@@ -11,4 +12,5 @@ import org.springframework.stereotype.Service
  * Created by macro on 2020/8/21.
  */
 @Service
-class UmsRoleMenuRelationServiceImpl : ServiceImpl<UmsRoleMenuRelationMapper, UmsRoleMenuRelation>(), UmsRoleMenuRelationService
+class UmsRoleMenuRelationServiceImpl : ServiceImpl<UmsRoleMenuRelationMapper, UmsRoleMenuRelation, UmsRoleMenuRelations>(),
+    UmsRoleMenuRelationService

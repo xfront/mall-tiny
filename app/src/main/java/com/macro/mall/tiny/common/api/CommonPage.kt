@@ -1,6 +1,7 @@
 package com.macro.mall.tiny.common.api
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.github.xfront.ktormplus.IPage
+
 
 /**
  * 分页数据封装类
@@ -17,12 +18,12 @@ class CommonPage<T> {
         /**
          * 将MyBatis Plus 分页结果转化为通用结果
          */
-        fun <T> restPage(pageResult: Page<T>): CommonPage<T> {
+        fun <T> restPage(pageResult: IPage<T>): CommonPage<T> {
             val result = CommonPage<T>()
-            result.pageNum = pageResult.current.toInt()
-            result.pageSize = pageResult.size.toInt()
+            result.pageNum = pageResult.current
+            result.pageSize = pageResult.size
             result.total = pageResult.total
-            result.totalPage = (pageResult.total / pageResult.size + 1).toInt()
+            result.totalPage = pageResult.pages
             result.list = pageResult.records
             return result
         }

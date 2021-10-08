@@ -23,7 +23,7 @@ class AdminUserDetails(private val umsAdmin: UmsAdmin, private val resourceList:
     }
 
     override fun getUsername(): String {
-        return umsAdmin.username
+        return umsAdmin.username ?: "(null)"
     }
 
     override fun isAccountNonExpired(): Boolean {

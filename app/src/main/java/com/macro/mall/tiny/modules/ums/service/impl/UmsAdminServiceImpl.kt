@@ -1,9 +1,7 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
 import cn.hutool.core.util.StrUtil
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
+import com.github.xfront.ktormplus.*
 import com.macro.mall.security.util.JwtTokenUtil
 import com.macro.mall.tiny.common.exception.Asserts
 import com.macro.mall.tiny.domain.AdminUserDetails
@@ -17,6 +15,9 @@ import com.macro.mall.tiny.modules.ums.model.*
 import com.macro.mall.tiny.modules.ums.service.UmsAdminCacheService
 import com.macro.mall.tiny.modules.ums.service.UmsAdminRoleRelationService
 import com.macro.mall.tiny.modules.ums.service.UmsAdminService
+import org.ktorm.dsl.eq
+import org.ktorm.dsl.like
+import org.ktorm.schema.ColumnDeclaring
 import org.slf4j.LoggerFactory
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,14 +30,14 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
-import java.util.*
+import java.time.LocalDateTime
 
 /**
  * 后台管理员管理Service实现类
  * Created by macro on 2018/4/26.
  */
 @Service
-class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminService {
+class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin, UmsAdmins>(), UmsAdminService {
     @Autowired
     lateinit var jwtTokenUtil: JwtTokenUtil
 
@@ -61,11 +62,9 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     override fun getAdminByUsername(username: String): UmsAdmin? {
         var admin = adminCacheService.getAdmin(username)
         if (admin != null) return admin
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", username)
-        //wrapper.lambda().eq(UmsAdmin::username, username)
-        val adminList = list(wrapper)
-        if (adminList != null && adminList.size > 0) {
+
+        val adminList = list { it.username eq username }
+        if (adminList.size > 0) {
             admin = adminList[0]
             adminCacheService.setAdmin(admin)
             return admin
@@ -76,19 +75,17 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     override fun register(umsAdminParam: UmsAdminParam): UmsAdmin? {
         val umsAdmin = UmsAdmin()
         BeanUtils.copyProperties(umsAdminParam, umsAdmin)
-        umsAdmin.createTime = Date()
+        umsAdmin.createTime = LocalDateTime.now()
         umsAdmin.status = 1 //查询是否有相同用户名的用户
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", umsAdmin.username)
-        //wrapper.lambda().eq(UmsAdmin::username, umsAdmin.username)
-        val umsAdminList = list(wrapper)
+
+        val umsAdminList = list { it.username eq umsAdmin.username!! }
         if (umsAdminList.size > 0) {
             return null
         }
         //将密码进行加密操作
         val encodePassword = passwordEncoder.encode(umsAdmin.password)
         umsAdmin.password = encodePassword
-        baseMapper.insert(umsAdmin)
+        save(umsAdmin)
         return umsAdmin
     }
 
@@ -121,7 +118,7 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
         val admin = getAdminByUsername(username) ?: return
         val loginLog = UmsAdminLoginLog()
         loginLog.adminId = admin.id
-        loginLog.createTime = Date()
+        loginLog.createTime = LocalDateTime.now()
         val attributes = RequestContextHolder.getRequestAttributes() as ServletRequestAttributes
         val request = attributes.request
         loginLog.ip = request.remoteAddr
@@ -132,26 +129,27 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
      * 根据用户名修改登录时间
      */
     private fun updateLoginTimeByUsername(username: String) {
-        val record = UmsAdmin()
-        record.loginTime = Date()
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", username)
-        //wrapper.lambda().eq(UmsAdmin::username, username)
-        update(record, wrapper)
+        update(null) {
+            set(it.loginTime, LocalDateTime.now())
+            where { it.username eq username }
+        }
     }
 
     override fun refreshToken(oldToken: String): String? {
         return jwtTokenUtil.refreshHeadToken(oldToken)
     }
 
-    override fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsAdmin> {
+    override fun list(keyword: String?, pageSize: Int, pageNum: Int): IPage<UmsAdmin> {
         val page = Page<UmsAdmin>(pageNum, pageSize)
-        val wrapper = QueryWrapper<UmsAdmin>()
-        if (!keyword.isNullOrBlank()) {
-            wrapper.like("username", keyword)
-            wrapper.or { wrapper.like("nick_name", keyword) }
+
+        return page(page) {
+            val cond = mutableListOf<ColumnDeclaring<Boolean>>()
+            if (!keyword.isNullOrBlank()) {
+                cond += it.username like keyword
+                cond += it.nickName like keyword
+            }
+            cond.combineOrConditions()
         }
-        return page(page, wrapper)
     }
 
     override fun update(id: Long, admin: UmsAdmin): Boolean {
@@ -181,14 +179,14 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     override fun updateRole(adminId: Long, roleIds: List<Long>): Int {
         val count = roleIds.size
         //先删除原来的关系
-        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
-        wrapper.eq("admin_id", adminId)
-        //wrapper.lambda().eq(UmsAdminRoleRelation::adminId, adminId)
-        adminRoleRelationService.remove(wrapper) //建立新关系
+        adminRoleRelationService.remove { it.adminId eq adminId } //建立新关系
         if (roleIds.isNotEmpty()) {
             val list = mutableListOf<UmsAdminRoleRelation>()
             for (roleId in roleIds) {
-                val roleRelation = UmsAdminRoleRelation(adminId, roleId)
+                val roleRelation = UmsAdminRoleRelation {
+                    this.adminId = adminId
+                    this.roleId = roleId
+                }
                 list.add(roleRelation)
             }
             adminRoleRelationService.saveBatch(list)
@@ -214,15 +212,11 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     }
 
     override fun updatePassword(param: UpdateAdminPasswordParam): Int {
-        if (param.username.isNullOrBlank()
-                ||  param.oldPassword.isNullOrBlank()
-                || param.newPassword.isNullOrBlank()) {
+        if (param.username.isNullOrBlank() || param.oldPassword.isNullOrBlank() || param.newPassword.isNullOrBlank()) {
             return -1
         }
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", param.username)
-        //wrapper.lambda().eq(UmsAdmin::username, param.username)
-        val adminList = list(wrapper)
+
+        val adminList = list { it.username eq param.username }
         if (adminList.isEmpty()) {
             return -2
         }

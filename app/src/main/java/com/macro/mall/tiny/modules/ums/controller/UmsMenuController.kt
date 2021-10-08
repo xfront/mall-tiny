@@ -2,7 +2,6 @@ package com.macro.mall.tiny.modules.ums.controller
 
 import com.macro.mall.tiny.common.api.CommonPage
 import com.macro.mall.tiny.common.api.CommonResult
-import com.macro.mall.tiny.modules.ums.dto.UmsMenuNode
 import com.macro.mall.tiny.modules.ums.model.UmsMenu
 import com.macro.mall.tiny.modules.ums.service.UmsMenuService
 import io.swagger.annotations.Api
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*
  * Created by macro on 2020/2/4.
  */
 @Controller
-@Api(tags = ["UmsMenuController"], description = "后台菜单管理")
+@Api(tags = ["后台菜单管理"])
 @RequestMapping("/menu")
 class UmsMenuController {
     @Autowired
@@ -73,8 +72,8 @@ class UmsMenuController {
     @ResponseBody
     fun list(
         @PathVariable parentId: Long,
-        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Long,
-        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Long
+        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Int,
+        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Int
     ): CommonResult<CommonPage<UmsMenu>> {
         val menuList = menuService.list(parentId, pageSize, pageNum)
         return CommonResult.success(CommonPage.restPage(menuList))
@@ -83,7 +82,7 @@ class UmsMenuController {
     @ApiOperation("树形结构返回所有菜单列表")
     @RequestMapping(value = ["/treeList"], method = [RequestMethod.GET])
     @ResponseBody
-    fun treeList(): CommonResult<List<UmsMenuNode>> {
+    fun treeList(): CommonResult<List<UmsMenu>> {
         val list = menuService.treeList()
         return CommonResult.success(list)
     }

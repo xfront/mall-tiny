@@ -1,35 +1,38 @@
 package com.macro.mall.tiny.modules.ums.model
 
-import com.baomidou.mybatisplus.annotation.IdType
-import com.baomidou.mybatisplus.annotation.TableId
-import com.baomidou.mybatisplus.annotation.TableName
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
-import java.io.Serializable
+import org.ktorm.entity.Entity
+import org.ktorm.schema.Table
+import org.ktorm.schema.long
 
-/**
- *
- *
- * 后台角色资源关系表
- *
- *
- * @author macro
- * @since 2020-08-21
- */
 
-@TableName("ums_role_resource_relation")
-@ApiModel(value = "UmsRoleResourceRelation对象", description = "后台角色资源关系表")
-class UmsRoleResourceRelation : Serializable {
-    @TableId(value = "id", type = IdType.AUTO)
-    var id: Long = -1
+//实体类： 后台角色资源关系表
+interface UmsRoleResourceRelation : Entity<UmsRoleResourceRelation> {
+    companion object : Entity.Factory<UmsRoleResourceRelation>()
 
-    @ApiModelProperty(value = "角色ID")
-    var roleId: Long = -1
 
-    @ApiModelProperty(value = "资源ID")
-    var resourceId: Long = -1
+    var id: Long
 
-    companion object {
-        private const val serialVersionUID = 1L
-    }
+    //资源ID
+    var resourceId: Long?
+
+    //角色ID
+    var roleId: Long?
+}
+
+
+//表定义： 后台角色资源关系表
+open class UmsRoleResourceRelations(alias: String?) : Table<UmsRoleResourceRelation>("ums_role_resource_relation", alias) {
+    companion object : UmsRoleResourceRelations(null)
+
+    override fun aliased(alias: String) = UmsRoleResourceRelations(alias)
+
+
+    val id = long("id").primaryKey()
+            .bindTo { it.id }
+
+    //资源ID
+    val resourceId = long("resource_id").bindTo { it.resourceId }
+
+    //角色ID
+    val roleId = long("role_id").bindTo { it.roleId }
 }

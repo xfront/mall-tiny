@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
  * Created by macro on 2018/9/30.
  */
 @Controller
-@Api(tags = ["UmsRoleController"], description = "后台用户角色管理")
+@Api(tags = ["后台用户角色管理"])
 @RequestMapping("/role")
 class UmsRoleController {
     @Autowired
@@ -58,7 +58,7 @@ class UmsRoleController {
     @RequestMapping(value = ["/listAll"], method = [RequestMethod.GET])
     @ResponseBody
     fun listAll(): CommonResult<List<UmsRole>> {
-        val roleList = roleService.list() as? List<UmsRole>
+        val roleList = roleService.list()
         return CommonResult.success(roleList)
     }
 
@@ -67,8 +67,8 @@ class UmsRoleController {
     @ResponseBody
     fun list(
         @RequestParam(value = "keyword", required = false) keyword: String?,
-        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Long,
-        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Long
+        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Int,
+        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Int
     ): CommonResult<CommonPage<UmsRole>> {
         val roleList = roleService.list(keyword, pageSize, pageNum)
         return CommonResult.success(CommonPage.restPage(roleList))

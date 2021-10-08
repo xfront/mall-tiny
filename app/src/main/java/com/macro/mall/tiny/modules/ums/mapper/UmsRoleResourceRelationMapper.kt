@@ -1,7 +1,9 @@
 package com.macro.mall.tiny.modules.ums.mapper
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper
+import com.github.xfront.ktormplus.KtormMapper
 import com.macro.mall.tiny.modules.ums.model.UmsRoleResourceRelation
+import com.macro.mall.tiny.modules.ums.model.UmsRoleResourceRelations
+import org.springframework.stereotype.Component
 
 /**
  *
@@ -12,4 +14,5 @@ import com.macro.mall.tiny.modules.ums.model.UmsRoleResourceRelation
  * @author macro
  * @since 2020-08-21
  */
-interface UmsRoleResourceRelationMapper : BaseMapper<UmsRoleResourceRelation>
+@Component
+class UmsRoleResourceRelationMapper : KtormMapper<UmsRoleResourceRelation, UmsRoleResourceRelations>()

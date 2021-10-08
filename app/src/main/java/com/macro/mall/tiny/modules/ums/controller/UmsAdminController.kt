@@ -26,7 +26,7 @@ typealias StringMap = Map<String, String>
  * Created by macro on 2018/4/26.
  */
 @Controller
-@Api(tags = ["UmsAdminController"], description = "后台用户管理")
+@Api(tags = ["后台用户管理"])
 @RequestMapping("/admin")
 class UmsAdminController {
     @Value("\${jwt.tokenHeader}")
@@ -106,8 +106,8 @@ class UmsAdminController {
     @ResponseBody
     fun list(
         @RequestParam(value = "keyword", required = false) keyword: String?,
-        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Long,
-        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Long
+        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Int,
+        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Int
     ): CommonResult<CommonPage<UmsAdmin>> {
         val adminList = adminService.list(keyword, pageSize, pageNum)
         return CommonResult.success(CommonPage.restPage(adminList))

@@ -10,3 +10,4 @@ pluginManagement {
 }
 rootProject.name = "mall-tiny"
 include(":app")
+include("ktorm-plus")

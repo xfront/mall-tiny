@@ -1,24 +1,26 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
-import com.macro.mall.tiny.modules.ums.dto.UmsMenuNode
+import com.github.xfront.ktormplus.IPage
+import com.github.xfront.ktormplus.Page
+import com.github.xfront.ktormplus.ServiceImpl
 import com.macro.mall.tiny.modules.ums.mapper.UmsMenuMapper
 import com.macro.mall.tiny.modules.ums.model.UmsMenu
+import com.macro.mall.tiny.modules.ums.model.UmsMenus
 import com.macro.mall.tiny.modules.ums.service.UmsMenuService
+import org.ktorm.dsl.*
+import org.ktorm.entity.toList
 import org.springframework.beans.BeanUtils
 import org.springframework.stereotype.Service
-import java.util.*
+import java.time.LocalDateTime
 
 /**
  * 后台菜单管理Service实现类
  * Created by macro on 2020/2/2.
  */
 @Service
-class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu>(), UmsMenuService {
+class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu, UmsMenus>(), UmsMenuService {
     override fun create(umsMenu: UmsMenu): Boolean {
-        umsMenu.createTime = Date()
+        umsMenu.createTime = LocalDateTime.now()
         updateLevel(umsMenu)
         return save(umsMenu)
     }
@@ -30,9 +32,9 @@ class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu>(), UmsMenuService
         if (umsMenu.parentId == 0L) { //没有父菜单时为一级菜单
             umsMenu.level = 0
         } else { //有父菜单时选择根据父菜单level设置
-            val parentMenu = getById(umsMenu.parentId)
+            val parentMenu = getById(umsMenu.parentId!!)
             if (parentMenu != null) {
-                umsMenu.level = parentMenu.level + 1
+                umsMenu.level = parentMenu.level!! + 1
             } else {
                 umsMenu.level = 0
             }
@@ -45,17 +47,20 @@ class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu>(), UmsMenuService
         return updateById(umsMenu)
     }
 
-    override fun list(parentId: Long, pageSize: Long, pageNum: Long): Page<UmsMenu> {
+    override fun list(parentId: Long, pageSize: Int, pageNum: Int): IPage<UmsMenu> {
         val page = Page<UmsMenu>(pageNum, pageSize)
-        val wrapper = QueryWrapper<UmsMenu>()
-        wrapper.eq("parent_id", parentId).orderByDesc("sort")
-        return page(page, wrapper)
+        return page(page,
+                mapper.entities.database
+                        .from(UmsMenus)
+                        .select(UmsMenus.columns)
+                        .where { UmsMenus.parentId eq parentId }
+                        .orderBy(UmsMenus.sort.asc())
+        )
     }
 
-    override fun treeList(): List<UmsMenuNode> {
-        val menuList = list()
-        return menuList
-                .filter { it.parentId == 0L }
+    override fun treeList(): List<UmsMenu> {
+        val menuList = mapper.entities.toList()
+        return menuList.filter { it.parentId == 0L }
                 .map { covertMenuNode(it, menuList) }
     }
 
@@ -69,8 +74,8 @@ class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu>(), UmsMenuService
     /**
      * 将UmsMenu转化为UmsMenuNode并设置children属性
      */
-    private fun covertMenuNode(menu: UmsMenu, menuList: List<UmsMenu>): UmsMenuNode {
-        val node = UmsMenuNode()
+    private fun covertMenuNode(menu: UmsMenu, menuList: List<UmsMenu>): UmsMenu {
+        val node = UmsMenu()
         BeanUtils.copyProperties(menu, node)
         val children = menuList
                 .filter { it.parentId == menu.id }

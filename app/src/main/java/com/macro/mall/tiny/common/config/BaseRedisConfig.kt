@@ -3,9 +3,11 @@ package com.macro.mall.tiny.common.config
 import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.macro.mall.tiny.AllOpen
 import com.macro.mall.tiny.common.service.RedisService
 import com.macro.mall.tiny.common.service.impl.RedisServiceImpl
+import org.ktorm.jackson.KtormModule
 import org.springframework.context.annotation.Bean
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
@@ -45,6 +47,8 @@ open class BaseRedisConfig {
         val mapper = ObjectMapper()
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
         mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.EVERYTHING)
+        mapper.registerModule(JavaTimeModule())
+        mapper.registerModule(KtormModule())
         serializer.setObjectMapper(mapper)
         return serializer
     }

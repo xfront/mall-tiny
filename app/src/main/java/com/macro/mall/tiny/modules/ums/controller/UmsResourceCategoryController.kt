@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
  * Created by macro on 2020/2/5.
  */
 @Controller
-@Api(tags = ["UmsResourceCategoryController"], description = "后台资源分类管理")
+@Api(tags = ["后台资源分类管理"])
 @RequestMapping("/resourceCategory")
 class UmsResourceCategoryController {
     @Autowired
@@ -58,7 +58,7 @@ class UmsResourceCategoryController {
     @ApiOperation("根据ID删除后台资源")
     @RequestMapping(value = ["/delete/{id}"], method = [RequestMethod.POST])
     @ResponseBody
-    fun delete(@PathVariable id: Long?): CommonResult<Any> {
+    fun delete(@PathVariable id: Long): CommonResult<Any> {
         val success = resourceCategoryService.removeById(id)
         return if (success) {
             CommonResult.success(null)

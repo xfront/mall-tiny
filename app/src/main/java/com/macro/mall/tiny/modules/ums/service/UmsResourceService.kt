@@ -1,14 +1,15 @@
 package com.macro.mall.tiny.modules.ums.service
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import com.baomidou.mybatisplus.extension.service.IService
+import com.github.xfront.ktormplus.IPage
+import com.github.xfront.ktormplus.IService
 import com.macro.mall.tiny.modules.ums.model.UmsResource
+import com.macro.mall.tiny.modules.ums.model.UmsResources
 
 /**
  * 后台资源管理Service
  * Created by macro on 2020/2/2.
  */
-interface UmsResourceService : IService<UmsResource> {
+interface UmsResourceService : IService<UmsResource, UmsResources> {
     /**
      * 添加资源
      */
@@ -27,5 +28,5 @@ interface UmsResourceService : IService<UmsResource> {
     /**
      * 分页查询资源
      */
-    fun list(categoryId: Long?, nameKeyword: String?, urlKeyword: String?, pageSize: Long, pageNum: Long): Page<UmsResource>
+    fun list(categoryId: Long?, nameKeyword: String?, urlKeyword: String?, pageSize: Int, pageNum: Int): IPage<UmsResource>
 }

@@ -1,31 +1,34 @@
 package com.macro.mall.tiny.modules.ums.model
 
-import com.baomidou.mybatisplus.annotation.IdType
-import com.baomidou.mybatisplus.annotation.TableId
-import com.baomidou.mybatisplus.annotation.TableName
-import io.swagger.annotations.ApiModel
-import java.io.Serializable
+import org.ktorm.entity.Entity
+import org.ktorm.schema.Table
+import org.ktorm.schema.long
 
-/**
- *
- *
- * 后台用户和角色关系表
- *
- *
- * @author macro
- * @since 2020-08-21
- */
 
-@TableName("ums_admin_role_relation")
-@ApiModel(value = "UmsAdminRoleRelation对象", description = "后台用户和角色关系表")
-data class UmsAdminRoleRelation(
-    var adminId: Long? = null,
-    var roleId: Long? = null,
-) : Serializable {
-    @TableId(value = "id", type = IdType.AUTO)
-    var id: Long = -1
+//实体类： 后台用户和角色关系表
+interface UmsAdminRoleRelation : Entity<UmsAdminRoleRelation> {
+    companion object : Entity.Factory<UmsAdminRoleRelation>()
 
-    companion object {
-        private const val serialVersionUID = 1L
-    }
+
+    var id: Long
+
+    var adminId: Long?
+
+    var roleId: Long?
+}
+
+
+//表定义： 后台用户和角色关系表
+open class UmsAdminRoleRelations(alias: String?) : Table<UmsAdminRoleRelation>("ums_admin_role_relation", alias) {
+    companion object : UmsAdminRoleRelations(null)
+
+    override fun aliased(alias: String) = UmsAdminRoleRelations(alias)
+
+
+    val id = long("id").primaryKey()
+            .bindTo { it.id }
+
+    val adminId = long("admin_id").bindTo { it.adminId }
+
+    val roleId = long("role_id").bindTo { it.roleId }
 }

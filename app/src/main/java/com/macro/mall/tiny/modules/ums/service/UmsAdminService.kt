@@ -1,10 +1,11 @@
 package com.macro.mall.tiny.modules.ums.service
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import com.baomidou.mybatisplus.extension.service.IService
+import com.github.xfront.ktormplus.IPage
+import com.github.xfront.ktormplus.IService
 import com.macro.mall.tiny.modules.ums.dto.UmsAdminParam
 import com.macro.mall.tiny.modules.ums.dto.UpdateAdminPasswordParam
 import com.macro.mall.tiny.modules.ums.model.UmsAdmin
+import com.macro.mall.tiny.modules.ums.model.UmsAdmins
 import com.macro.mall.tiny.modules.ums.model.UmsResource
 import com.macro.mall.tiny.modules.ums.model.UmsRole
 import org.springframework.security.core.userdetails.UserDetails
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
  * 后台管理员管理Service
  * Created by macro on 2018/4/26.
  */
-interface UmsAdminService : IService<UmsAdmin> {
+interface UmsAdminService : IService<UmsAdmin, UmsAdmins> {
     /**
      * 根据用户名获取后台管理员
      */
@@ -42,7 +43,7 @@ interface UmsAdminService : IService<UmsAdmin> {
     /**
      * 根据用户名或昵称分页查询用户
      */
-    fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsAdmin>
+    fun list(keyword: String?, pageSize: Int, pageNum: Int): IPage<UmsAdmin>
 
     /**
      * 修改指定用户信息

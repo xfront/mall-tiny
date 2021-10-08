@@ -1,7 +1,9 @@
 package com.macro.mall.tiny.modules.ums.mapper
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper
+import com.github.xfront.ktormplus.KtormMapper
 import com.macro.mall.tiny.modules.ums.model.UmsResourceCategory
+import com.macro.mall.tiny.modules.ums.model.UmsResourceCategorys
+import org.springframework.stereotype.Component
 
 /**
  *
@@ -12,4 +14,5 @@ import com.macro.mall.tiny.modules.ums.model.UmsResourceCategory
  * @author macro
  * @since 2020-08-21
  */
-interface UmsResourceCategoryMapper : BaseMapper<UmsResourceCategory>
+@Component
+class UmsResourceCategoryMapper : KtormMapper<UmsResourceCategory, UmsResourceCategorys>()

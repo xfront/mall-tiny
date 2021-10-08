@@ -40,7 +40,7 @@ class MallSecurityConfig : SecurityConfig() {
                 val map = ConcurrentHashMap<String, ConfigAttribute>()
                 val resourceList = resourceService.list()
                 for (resource in resourceList) {
-                    map[resource!!.url] =
+                    map[resource.url!!] =
                         org.springframework.security.access.SecurityConfig("""${resource.id}:${resource.name}""")
                 }
                 return map

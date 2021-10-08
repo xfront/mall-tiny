@@ -12,14 +12,14 @@ data class UmsAdminParam(
     @NotEmpty
     @ApiModelProperty(value = "用户名", required = true)
     var username:String? = null,
-    
+
     @NotEmpty
     @ApiModelProperty(value = "密码", required = true)
     var password: String? = null,
 
     @ApiModelProperty(value = "用户头像")
     var icon: String? = null,
-    
+
     @Email
     @ApiModelProperty(value = "邮箱")
     var email:String? = null,

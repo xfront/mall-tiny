@@ -1,17 +1,18 @@
 package com.macro.mall.tiny.modules.ums.service
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import com.baomidou.mybatisplus.extension.service.IService
+import com.github.xfront.ktormplus.IPage
+import com.github.xfront.ktormplus.IService
 import com.macro.mall.tiny.modules.ums.model.UmsMenu
 import com.macro.mall.tiny.modules.ums.model.UmsResource
 import com.macro.mall.tiny.modules.ums.model.UmsRole
+import com.macro.mall.tiny.modules.ums.model.UmsRoles
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * 后台角色管理Service
  * Created by macro on 2018/9/30.
  */
-interface UmsRoleService : IService<UmsRole?> {
+interface UmsRoleService : IService<UmsRole, UmsRoles> {
     /**
      * 添加角色
      */
@@ -25,7 +26,7 @@ interface UmsRoleService : IService<UmsRole?> {
     /**
      * 分页获取角色列表
      */
-    fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsRole>
+    fun list(keyword: String?, pageSize: Int, pageNum: Int): IPage<UmsRole>
 
     /**
      * 根据管理员ID获取对应菜单

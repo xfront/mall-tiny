@@ -1,14 +1,14 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.macro.mall.tiny.common.service.RedisService
 import com.macro.mall.tiny.modules.ums.mapper.UmsAdminMapper
 import com.macro.mall.tiny.modules.ums.model.UmsAdmin
-import com.macro.mall.tiny.modules.ums.model.UmsAdminRoleRelation
 import com.macro.mall.tiny.modules.ums.model.UmsResource
 import com.macro.mall.tiny.modules.ums.service.UmsAdminCacheService
 import com.macro.mall.tiny.modules.ums.service.UmsAdminRoleRelationService
 import com.macro.mall.tiny.modules.ums.service.UmsAdminService
+import org.ktorm.dsl.eq
+import org.ktorm.dsl.inList
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -57,9 +57,9 @@ class UmsAdminCacheServiceImpl : UmsAdminCacheService {
     }
 
     override fun delResourceListByRole(roleId: Long) {
-        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
-        wrapper.eq("role_id", roleId)
-        val relationList = adminRoleRelationService.list(wrapper)
+        val relationList = adminRoleRelationService.list {
+            it.roleId eq roleId
+        }
         if (!relationList.isNullOrEmpty()) {
             val keyPrefix = "$REDIS_DATABASE:$REDIS_KEY_RESOURCE_LIST:"
             val keys = relationList.map { keyPrefix + it.adminId }
@@ -68,9 +68,9 @@ class UmsAdminCacheServiceImpl : UmsAdminCacheService {
     }
 
     override fun delResourceListByRoleIds(roleIds: List<Long>) {
-        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
-        wrapper.`in`("role_id", roleIds)
-        val relationList = adminRoleRelationService.list(wrapper)
+        val relationList = adminRoleRelationService.list {
+            it.roleId inList roleIds
+        }
 
         val keyPrefix = "$REDIS_DATABASE:$REDIS_KEY_RESOURCE_LIST:"
         val keys = relationList.map { keyPrefix + it.adminId }
@@ -101,6 +101,6 @@ class UmsAdminCacheServiceImpl : UmsAdminCacheService {
 
     override fun setResourceList(adminId: Long, resourceList: List<UmsResource>) {
         val key = "$REDIS_DATABASE:$REDIS_KEY_RESOURCE_LIST:$adminId"
-        redisService[key, resourceList] = REDIS_EXPIRE
+        redisService.set(key, resourceList, REDIS_EXPIRE)
     }
 }

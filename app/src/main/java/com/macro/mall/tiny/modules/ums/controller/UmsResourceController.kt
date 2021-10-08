@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
  * Created by macro on 2020/2/4.
  */
 @Controller
-@Api(tags = ["UmsResourceController"], description = "后台资源管理")
+@Api(tags = ["后台资源管理"])
 @RequestMapping("/resource")
 class UmsResourceController {
     @Autowired
@@ -56,9 +56,9 @@ class UmsResourceController {
     @ApiOperation("根据ID获取资源详情")
     @RequestMapping(value = ["/{id}"], method = [RequestMethod.GET])
     @ResponseBody
-    fun getItem(@PathVariable id: Long?): CommonResult<UmsResource?> {
+    fun getItem(@PathVariable id: Long): CommonResult<UmsResource?> {
         val umsResource = resourceService.getById(id)
-        return CommonResult.success<UmsResource?>(umsResource)
+        return CommonResult.success(umsResource)
     }
 
     @ApiOperation("根据ID删除后台资源")
@@ -81,8 +81,8 @@ class UmsResourceController {
         @RequestParam(required = false) categoryId: Long?,
         @RequestParam(required = false) nameKeyword: String?,
         @RequestParam(required = false) urlKeyword: String?,
-        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Long,
-        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Long
+        @RequestParam(value = "pageSize", defaultValue = "5") pageSize: Int,
+        @RequestParam(value = "pageNum", defaultValue = "1") pageNum: Int
     ): CommonResult<CommonPage<UmsResource>> {
         val resourceList = resourceService.list(categoryId, nameKeyword, urlKeyword, pageSize, pageNum)
         return CommonResult.success(CommonPage.restPage(resourceList))
