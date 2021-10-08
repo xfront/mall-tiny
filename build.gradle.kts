@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.springframework.boot") version "2.5.5" apply false
-    `maven-publish`
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
     kotlin("plugin.allopen") version "1.5.31"
@@ -24,65 +24,60 @@ configurations {
     }
 }
 
-allOpen {
-    annotation("com.macro.mall.tiny.AllOpen")
-}
-
 repositories {
     mavenLocal()
-    maven {
-        url = uri("https://repo.maven.apache.org/maven2/")
-    }
+    maven { url = uri("https://repo.maven.apache.org/maven2/") }
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.spring.io/release") }
     mavenCentral()
 }
 
-dependencies {
-    implementation(enforcedPlatform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+subprojects {
+    apply{
+        plugin("io.spring.dependency-management")
+        plugin("org.springframework.boot")
+        plugin("org.jetbrains.kotlin.plugin.spring")
+        plugin("org.jetbrains.kotlin.plugin.allopen")
+        plugin("org.jetbrains.kotlin.jvm")
+    }
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-configuration-processor")
-    implementation("com.alibaba:druid-spring-boot-starter:1.2.6")
-    implementation("mysql:mysql-connector-java:8.0.25")
-    implementation("io.springfox:springfox-swagger2:2.9.2")
-    implementation("io.springfox:springfox-swagger-ui:2.9.2")
-    implementation("io.swagger:swagger-models:1.6.2")
-    implementation("io.swagger:swagger-annotations:1.6.2")
-    implementation("cn.hutool:hutool-all:5.7.11")
-    implementation("io.jsonwebtoken:jjwt:0.9.1")
-    implementation("javax.xml.bind:jaxb-api:2.3.3")
-    implementation("com.baomidou:mybatis-plus-boot-starter:3.3.2")
-    implementation("com.baomidou:mybatis-plus-generator:3.3.2")
-    implementation("org.apache.velocity:velocity-engine-core:2.3")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
+    repositories {
+        mavenLocal()
+        maven { url = uri("https://repo.maven.apache.org/maven2/") }
+        maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://repo.spring.io/release") }
+        mavenCentral()
+    }
 
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
+    allOpen {
+        annotation("com.macro.mall.tiny.AllOpen")
+    }
+
+
+    dependencies {
+        implementation(enforcedPlatform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
+        implementation(kotlin("stdlib-jdk8"))
+        implementation(kotlin("reflect"))
+
+        implementation("org.springframework.boot:spring-boot-starter")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+        annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+        //developmentOnly("org.springframework.boot:spring-boot-devtools")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+    }
+
+    tasks.withType<JavaCompile>() {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "11"
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 }
-
-tasks.withType<JavaCompile>() {
-    options.encoding = "UTF-8"
-
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
