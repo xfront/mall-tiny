@@ -1,6 +1,6 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import com.macro.mall.tiny.modules.ums.mapper.UmsMenuMapper
@@ -51,9 +51,9 @@ class UmsRoleServiceImpl : ServiceImpl<UmsRoleMapper, UmsRole>(), UmsRoleService
 
     override fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsRole> {
         val page = Page<UmsRole>(pageNum, pageSize)
-        val wrapper = QueryWrapper<UmsRole>()
+        val wrapper = KtQueryWrapper(UmsRole::class.java)
         if (!keyword.isNullOrBlank()) {
-            wrapper.like("name", keyword)
+            wrapper.like(UmsRole::name, keyword)
         }
         return page(page, wrapper)
     }
@@ -70,11 +70,13 @@ class UmsRoleServiceImpl : ServiceImpl<UmsRoleMapper, UmsRole>(), UmsRoleService
         return resourceMapper.getResourceListByRoleId(roleId)
     }
 
-    override fun allocMenu(roleId: Long, menuIds: List<Long>): Int { //先删除原有关系
-        val wrapper = QueryWrapper<UmsRoleMenuRelation>()
-        wrapper.eq("role_id", roleId)
-        //wrapper.lambda().eq(UmsRoleMenuRelation::roleId, roleId)
-        roleMenuRelationService.remove(wrapper) //批量插入新关系
+    override fun allocMenu(roleId: Long, menuIds: List<Long>): Int {
+        //先删除原有关系
+        roleMenuRelationService.ktUpdate()
+                .eq(UmsRoleMenuRelation::roleId, roleId)
+                .remove()
+
+        //批量插入新关系
         val relationList = mutableListOf<UmsRoleMenuRelation>()
         for (menuId in menuIds) {
             val relation = UmsRoleMenuRelation()
@@ -86,11 +88,13 @@ class UmsRoleServiceImpl : ServiceImpl<UmsRoleMapper, UmsRole>(), UmsRoleService
         return menuIds.size
     }
 
-    override fun allocResource(roleId: Long, resourceIds: List<Long>): Int { //先删除原有关系
-        val wrapper = QueryWrapper<UmsRoleResourceRelation>()
-        wrapper.eq("role_id", roleId)
-        //wrapper.lambda().eq(UmsRoleResourceRelation::roleId, roleId)
-        roleResourceRelationService.remove(wrapper) //批量插入新关系
+    override fun allocResource(roleId: Long, resourceIds: List<Long>): Int {
+        //先删除原有关系
+        roleResourceRelationService.ktUpdate()
+                .eq(UmsRoleResourceRelation::roleId, roleId)
+                .remove()
+
+        //批量插入新关系
         val relationList = mutableListOf<UmsRoleResourceRelation>()
         for (resourceId in resourceIds) {
             val relation = UmsRoleResourceRelation()

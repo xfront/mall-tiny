@@ -1,6 +1,6 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import com.macro.mall.tiny.modules.ums.dto.UmsMenuNode
@@ -27,9 +27,11 @@ class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu>(), UmsMenuService
      * 修改菜单层级
      */
     private fun updateLevel(umsMenu: UmsMenu) {
-        if (umsMenu.parentId == 0L) { //没有父菜单时为一级菜单
+        if (umsMenu.parentId == 0L) {
+            //没有父菜单时为一级菜单
             umsMenu.level = 0
-        } else { //有父菜单时选择根据父菜单level设置
+        } else {
+            //有父菜单时选择根据父菜单level设置
             val parentMenu = getById(umsMenu.parentId)
             if (parentMenu != null) {
                 umsMenu.level = parentMenu.level + 1
@@ -47,8 +49,8 @@ class UmsMenuServiceImpl : ServiceImpl<UmsMenuMapper, UmsMenu>(), UmsMenuService
 
     override fun list(parentId: Long, pageSize: Long, pageNum: Long): Page<UmsMenu> {
         val page = Page<UmsMenu>(pageNum, pageSize)
-        val wrapper = QueryWrapper<UmsMenu>()
-        wrapper.eq("parent_id", parentId).orderByDesc("sort")
+        val wrapper = KtQueryWrapper(UmsMenu::class.java)
+        wrapper.eq(UmsMenu::parentId, parentId).orderByDesc(UmsMenu::sort)
         return page(page, wrapper)
     }
 

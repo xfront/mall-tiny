@@ -1,6 +1,6 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.macro.mall.tiny.common.service.RedisService
 import com.macro.mall.tiny.modules.ums.mapper.UmsAdminMapper
 import com.macro.mall.tiny.modules.ums.model.UmsAdmin
@@ -57,8 +57,8 @@ class UmsAdminCacheServiceImpl : UmsAdminCacheService {
     }
 
     override fun delResourceListByRole(roleId: Long) {
-        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
-        wrapper.eq("role_id", roleId)
+        val wrapper = KtQueryWrapper(UmsAdminRoleRelation::class.java)
+        wrapper.eq(UmsAdminRoleRelation::roleId, roleId)
         val relationList = adminRoleRelationService.list(wrapper)
         if (!relationList.isNullOrEmpty()) {
             val keyPrefix = "$REDIS_DATABASE:$REDIS_KEY_RESOURCE_LIST:"
@@ -68,8 +68,8 @@ class UmsAdminCacheServiceImpl : UmsAdminCacheService {
     }
 
     override fun delResourceListByRoleIds(roleIds: List<Long>) {
-        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
-        wrapper.`in`("role_id", roleIds)
+        val wrapper = KtQueryWrapper(UmsAdminRoleRelation::class.java)
+        wrapper.`in`(UmsAdminRoleRelation::roleId, roleIds)
         val relationList = adminRoleRelationService.list(wrapper)
 
         val keyPrefix = "$REDIS_DATABASE:$REDIS_KEY_RESOURCE_LIST:"

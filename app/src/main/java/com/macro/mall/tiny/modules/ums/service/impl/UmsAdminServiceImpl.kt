@@ -1,7 +1,7 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
 import cn.hutool.core.util.StrUtil
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import com.macro.mall.security.util.JwtTokenUtil
@@ -61,10 +61,8 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     override fun getAdminByUsername(username: String): UmsAdmin? {
         var admin = adminCacheService.getAdmin(username)
         if (admin != null) return admin
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", username)
-        //wrapper.lambda().eq(UmsAdmin::username, username)
-        val adminList = list(wrapper)
+        val adminList = ktQuery().eq(UmsAdmin::username, username)
+                .list()
         if (adminList != null && adminList.size > 0) {
             admin = adminList[0]
             adminCacheService.setAdmin(admin)
@@ -77,14 +75,16 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
         val umsAdmin = UmsAdmin()
         BeanUtils.copyProperties(umsAdminParam, umsAdmin)
         umsAdmin.createTime = Date()
-        umsAdmin.status = 1 //查询是否有相同用户名的用户
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", umsAdmin.username)
-        //wrapper.lambda().eq(UmsAdmin::username, umsAdmin.username)
-        val umsAdminList = list(wrapper)
+        umsAdmin.status = 1
+
+        //查询是否有相同用户名的用户
+        val umsAdminList = ktQuery()
+                .eq(UmsAdmin::username, umsAdmin.username)
+                .list()
         if (umsAdminList.size > 0) {
             return null
         }
+
         //将密码进行加密操作
         val encodePassword = passwordEncoder.encode(umsAdmin.password)
         umsAdmin.password = encodePassword
@@ -94,6 +94,7 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
 
     override fun login(username: String, password: String): String {
         var token = ""
+
         //密码需要客户端加密后传递
         try {
             val userDetails = loadUserByUsername(username)
@@ -105,7 +106,8 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
             }
             val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
             SecurityContextHolder.getContext().authentication = authentication
-            token = jwtTokenUtil.generateToken(userDetails) //            updateLoginTimeByUsername(username);
+            token = jwtTokenUtil.generateToken(userDetails)
+            //updateLoginTimeByUsername(username);
             insertLoginLog(username)
         } catch (e: AuthenticationException) {
             LOGGER.warn("登录异常:{}", e.message)
@@ -134,10 +136,8 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     private fun updateLoginTimeByUsername(username: String) {
         val record = UmsAdmin()
         record.loginTime = Date()
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", username)
-        //wrapper.lambda().eq(UmsAdmin::username, username)
-        update(record, wrapper)
+        ktUpdate().eq(UmsAdmin::username, username)
+                .update(record)
     }
 
     override fun refreshToken(oldToken: String): String? {
@@ -146,10 +146,10 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
 
     override fun list(keyword: String?, pageSize: Long, pageNum: Long): Page<UmsAdmin> {
         val page = Page<UmsAdmin>(pageNum, pageSize)
-        val wrapper = QueryWrapper<UmsAdmin>()
+        val wrapper = KtQueryWrapper(UmsAdmin::class.java)
         if (!keyword.isNullOrBlank()) {
-            wrapper.like("username", keyword)
-            wrapper.or { wrapper.like("nick_name", keyword) }
+            wrapper.like(UmsAdmin::username, keyword)
+            wrapper.or { wrapper.like(UmsAdmin::nickName, keyword) }
         }
         return page(page, wrapper)
     }
@@ -157,9 +157,11 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     override fun update(id: Long, admin: UmsAdmin): Boolean {
         admin.id = id
         val rawAdmin = getById(id) ?: return false
-        if (rawAdmin.password == admin.password) { //与原加密密码相同的不需要修改
+        if (rawAdmin.password == admin.password) {
+            //与原加密密码相同的不需要修改
             admin.password = null
-        } else { //与原加密密码不同的需要加密修改
+        } else {
+            //与原加密密码不同的需要加密修改
             if (StrUtil.isEmpty(admin.password)) {
                 admin.password = null
             } else {
@@ -181,10 +183,11 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     override fun updateRole(adminId: Long, roleIds: List<Long>): Int {
         val count = roleIds.size
         //先删除原来的关系
-        val wrapper = QueryWrapper<UmsAdminRoleRelation>()
-        wrapper.eq("admin_id", adminId)
-        //wrapper.lambda().eq(UmsAdminRoleRelation::adminId, adminId)
-        adminRoleRelationService.remove(wrapper) //建立新关系
+        adminRoleRelationService.ktUpdate()
+                .eq(UmsAdminRoleRelation::adminId, adminId)
+                .remove()
+
+        //建立新关系
         if (roleIds.isNotEmpty()) {
             val list = mutableListOf<UmsAdminRoleRelation>()
             for (roleId in roleIds) {
@@ -214,15 +217,11 @@ class UmsAdminServiceImpl : ServiceImpl<UmsAdminMapper, UmsAdmin>(), UmsAdminSer
     }
 
     override fun updatePassword(param: UpdateAdminPasswordParam): Int {
-        if (param.username.isNullOrBlank()
-                ||  param.oldPassword.isNullOrBlank()
-                || param.newPassword.isNullOrBlank()) {
+        if (param.username.isNullOrBlank() || param.oldPassword.isNullOrBlank() || param.newPassword.isNullOrBlank()) {
             return -1
         }
-        val wrapper = QueryWrapper<UmsAdmin>()
-        wrapper.eq("username", param.username)
-        //wrapper.lambda().eq(UmsAdmin::username, param.username)
-        val adminList = list(wrapper)
+        val adminList = ktQuery().eq(UmsAdmin::username, param.username)
+                .list()
         if (adminList.isEmpty()) {
             return -2
         }

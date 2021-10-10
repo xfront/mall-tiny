@@ -1,6 +1,5 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import com.macro.mall.tiny.modules.ums.mapper.UmsResourceCategoryMapper
 import com.macro.mall.tiny.modules.ums.model.UmsResourceCategory
@@ -15,10 +14,7 @@ import java.util.*
 @Service
 class UmsResourceCategoryServiceImpl : ServiceImpl<UmsResourceCategoryMapper, UmsResourceCategory>(), UmsResourceCategoryService {
     override fun listAll(): List<UmsResourceCategory> {
-        val wrapper = QueryWrapper<UmsResourceCategory>()
-        wrapper.orderByDesc("sort")
-        //wrapper.lambda().orderByDesc(UmsResourceCategory::sort)
-        return list(wrapper)
+        return ktQuery().orderByAsc(UmsResourceCategory::sort).list()
     }
 
     override fun create(umsResourceCategory: UmsResourceCategory): Boolean {

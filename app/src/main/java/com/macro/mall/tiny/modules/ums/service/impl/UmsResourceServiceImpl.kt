@@ -1,6 +1,6 @@
 package com.macro.mall.tiny.modules.ums.service.impl
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import com.macro.mall.tiny.modules.ums.mapper.UmsResourceMapper
@@ -41,16 +41,16 @@ class UmsResourceServiceImpl : ServiceImpl<UmsResourceMapper, UmsResource>(), Um
         categoryId: Long?, nameKeyword: String?, urlKeyword: String?, pageSize: Long, pageNum: Long
     ): Page<UmsResource> {
         val page = Page<UmsResource>(pageNum, pageSize)
-        val wrapper = QueryWrapper<UmsResource>()
+        val wrapper = KtQueryWrapper(UmsResource::class.java)
 
         if (categoryId != null) {
-            wrapper.eq("category_id", categoryId)
+            wrapper.eq(UmsResource::categoryId, categoryId)
         }
         if (!nameKeyword.isNullOrBlank()) {
-            wrapper.like("name", nameKeyword)
+            wrapper.like(UmsResource::name, nameKeyword)
         }
         if (!urlKeyword.isNullOrBlank()) {
-            wrapper.like("url", urlKeyword)
+            wrapper.like(UmsResource::url, urlKeyword)
         }
         return page(page, wrapper)
     }
